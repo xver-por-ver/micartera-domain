@@ -1,18 +1,7 @@
-name: PHPUnit test & Static code analysis
+name: Application Quality Assurance
 
 on:
-  push:
-    branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - LICENSE
-      - 'translations/**'
-  pull_request:
-    branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - LICENSE
-      - 'translations/**'
+  workflow_call:
 
 env:
   XDEBUG_MODE: coverage
@@ -22,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    name: micartera-domain
+    name: Install, Build, Test and Analyze
 
     runs-on: ubuntu-latest
 
@@ -37,10 +26,10 @@ jobs:
         ports:
           - 3306:3306/tcp
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
+    
     strategy:
       fail-fast: false
-
+    
     env:
       APP_ENV: test
       APP_SECRET: kv95njkb5t90v89jtrbjh3bvdv
@@ -79,7 +68,7 @@ jobs:
         devbox run bin/console doctrine:schema:drop --force --env=test || echo "Schema drop failed"
         devbox run bin/console doctrine:schema:create --env=test || echo "Schema create failed"
         devbox run bin/console doctrine:fixtures:load --no-interaction --env=test || echo "Fixtures load failed"
-
+    
     - name: Run all test suites
       run: devbox run vendor/bin/phpunit --testsuite=all --coverage-text
        

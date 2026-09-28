@@ -5785,12 +5785,12 @@
             "version": "1.0.10",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sgurdiel/php-app-core.git",
+                "url": "https://github.com/xver-por-ver/php-app-core.git",
                 "reference": "2177df29417ea52632741b11852a06f4d30bc2bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sgurdiel/php-app-core/zipball/2177df29417ea52632741b11852a06f4d30bc2bb",
+                "url": "https://api.github.com/repos/xver-por-ver/php-app-core/zipball/2177df29417ea52632741b11852a06f4d30bc2bb",
                 "reference": "2177df29417ea52632741b11852a06f4d30bc2bb",
                 "shasum": ""
             },
@@ -5825,16 +5825,16 @@
         },
         {
             "name": "xver/php-auth-core",
-            "version": "1.0.12",
+            "version": "1.0.13",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sgurdiel/php-auth-core.git",
-                "reference": "03e322ce6210d40b8a5d792dc0f28f832a7561c5"
+                "url": "https://github.com/xver-por-ver/php-auth-core.git",
+                "reference": "eea4779c88f572b3e64d9615d8b98d1a53d689d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sgurdiel/php-auth-core/zipball/03e322ce6210d40b8a5d792dc0f28f832a7561c5",
-                "reference": "03e322ce6210d40b8a5d792dc0f28f832a7561c5",
+                "url": "https://api.github.com/repos/xver-por-ver/php-auth-core/zipball/eea4779c88f572b3e64d9615d8b98d1a53d689d0",
+                "reference": "eea4779c88f572b3e64d9615d8b98d1a53d689d0",
                 "shasum": ""
             },
             "require": {
@@ -5868,10 +5868,10 @@
             ],
             "description": "Provides Authentication",
             "support": {
-                "issues": "https://github.com/sgurdiel/php-auth-core/issues",
-                "source": "https://github.com/sgurdiel/php-auth-core/tree/1.0.12"
+                "issues": "https://github.com/xver-por-ver/php-auth-core/issues",
+                "source": "https://github.com/xver-por-ver/php-auth-core/tree/1.0.13"
             },
-            "time": "2026-09-22T16:20:26+00:00"
+            "time": "2026-09-27T16:44:23+00:00"
         }
     ],
     "packages-dev": [

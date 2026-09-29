@@ -19,7 +19,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class ExchangePersistence extends EntityPersistence implements ExchangePersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {}
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Exchange::class);
+    }
 
     #[\Override]
     public function getRepository(): EntityRepositoryInterface

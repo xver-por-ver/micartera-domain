@@ -17,9 +17,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class AcquisitionPersistence extends EntityPersistence implements AcquisitionPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry)
-    {
-        parent::__construct($this->entityManager(), Acquisition::class);
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Acquisition::class);
     }
 
     /**

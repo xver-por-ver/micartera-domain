@@ -3,6 +3,7 @@
 namespace Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityPersistenceInterface;
@@ -15,10 +16,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 abstract class EntityPersistence implements EntityPersistenceInterface
 {
-    /**
-     * @param class-string<T> $entityClass
-     */
-    public function __construct(private EntityManager $entityManager, private string $entityClass) {}
+    public function __construct(private ManagerRegistry $managerRegistry, private String $entityClass) 
+    { 
+    }
 
     /**
      * @param T $entity
@@ -27,7 +27,7 @@ abstract class EntityPersistence implements EntityPersistenceInterface
     public function persist(EntityInterface $entity): self
     {
         $this->validateRepositoryCanOperateEntity($entity);
-        $this->entityManager->persist($entity);
+        $this->entityManager()->persist($entity);
 
         return $this;
     }
@@ -39,7 +39,7 @@ abstract class EntityPersistence implements EntityPersistenceInterface
     public function remove(EntityInterface $entity): self
     {
         $this->validateRepositoryCanOperateEntity($entity);
-        $this->entityManager->remove($entity);
+        $this->entityManager()->remove($entity);
 
         return $this;
     }
@@ -47,7 +47,7 @@ abstract class EntityPersistence implements EntityPersistenceInterface
     #[\Override]
     public function flush(): self
     {
-        $this->entityManager->flush();
+        $this->entityManager()->flush();
 
         return $this;
     }
@@ -55,7 +55,7 @@ abstract class EntityPersistence implements EntityPersistenceInterface
     #[\Override]
     public function beginTransaction(): self
     {
-        $this->entityManager->beginTransaction();
+        $this->entityManager()->beginTransaction();
 
         return $this;
     }
@@ -63,7 +63,7 @@ abstract class EntityPersistence implements EntityPersistenceInterface
     #[\Override]
     public function commit(): self
     {
-        $this->entityManager->commit();
+        $this->entityManager()->commit();
 
         return $this;
     }
@@ -71,7 +71,7 @@ abstract class EntityPersistence implements EntityPersistenceInterface
     #[\Override]
     public function rollBack(): self
     {
-        $this->entityManager->rollback();
+        $this->entityManager()->rollback();
 
         return $this;
     }
@@ -86,5 +86,15 @@ abstract class EntityPersistence implements EntityPersistenceInterface
                 )
             );
         }
+    }
+
+    private function entityManager(): EntityManager
+    {
+        $manager = $this->managerRegistry->getManager();
+        if (!$manager instanceof EntityManager) {
+            throw new \LogicException('Liquidation persistence requires a Doctrine ORM entity manager.');
+        }
+
+        return $manager;
     }
 }

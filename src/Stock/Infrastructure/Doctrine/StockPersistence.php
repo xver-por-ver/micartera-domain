@@ -21,7 +21,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class StockPersistence extends EntityPersistence implements StockPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {}
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Stock::class);
+    }
 
     #[\Override]
     public function getRepository(): EntityRepositoryInterface

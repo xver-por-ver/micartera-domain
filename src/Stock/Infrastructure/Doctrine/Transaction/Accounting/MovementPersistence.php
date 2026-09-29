@@ -17,9 +17,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class MovementPersistence extends EntityPersistence implements MovementPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry)
-    {
-        parent::__construct($this->entityManager(), Movement::class);
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Movement::class);
     }
 
     /**

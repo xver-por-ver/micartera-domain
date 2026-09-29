@@ -2,7 +2,6 @@
 
 namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityPersistence;
@@ -17,9 +16,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class LiquidationPersistence extends EntityPersistence implements LiquidationPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry)
-    {
-        parent::__construct($this->entityManager(), Liquidation::class);
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Liquidation::class);
     }
 
     /**
@@ -34,15 +32,5 @@ final class LiquidationPersistence extends EntityPersistence implements Liquidat
         }
 
         return $repository;
-    }
-
-    private function entityManager(): EntityManager
-    {
-        $manager = $this->managerRegistry->getManager();
-        if (!$manager instanceof EntityManager) {
-            throw new \LogicException('Liquidation persistence requires a Doctrine ORM entity manager.');
-        }
-
-        return $manager;
     }
 }

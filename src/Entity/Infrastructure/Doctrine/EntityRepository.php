@@ -4,10 +4,8 @@ namespace Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Translation\TranslatableMessage;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
-use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
 /**
  * @template T of EntityInterface

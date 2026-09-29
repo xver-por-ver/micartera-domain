@@ -2,7 +2,7 @@
 
 namespace Xver\MiCartera\Domain\Account\Infrastructure\Doctrine;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
@@ -21,15 +21,14 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class AccountPersistence extends EntityPersistence implements AccountPersistenceInterface
 {
-    public function __construct(private EntityManager $entityManager) 
-    {
-        // parent::__construct($this->entityManager, Account::class);
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Account::class);
     }
 
     #[\Override]
     public function getRepository(): EntityRepositoryInterface
     {
-        $repository = $this->entityManager->getRepository(Account::class);
+        $repository = $this->managerRegistry->getRepository(Account::class);
         if (!$repository instanceof AccountRepositoryInterface) {
             throw new DomainViolationException(
                 new TranslatableMessage(
@@ -44,7 +43,7 @@ final class AccountPersistence extends EntityPersistence implements AccountPersi
     #[\Override]
     public function getRepositoryForCurrency(): EntityRepositoryInterface
     {
-        $repository = $this->entityManager->getRepository(Currency::class);
+        $repository = $this->managerRegistry->getRepository(Currency::class);
         if (!$repository instanceof CurrencyRepositoryInterface) {
             throw new DomainViolationException(
                 new TranslatableMessage(

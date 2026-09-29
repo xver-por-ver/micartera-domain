@@ -23,6 +23,9 @@ final class CurrencyPersistence extends EntityPersistence implements CurrencyPer
         parent::__construct($this->managerRegistry, Currency::class);
     }
 
+    /**
+     * @return CurrencyRepositoryInterface
+     */
     #[\Override]
     public function getRepository(): EntityRepositoryInterface
     {

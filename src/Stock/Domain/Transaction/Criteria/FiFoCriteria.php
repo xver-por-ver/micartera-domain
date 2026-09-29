@@ -107,6 +107,7 @@ class FiFoCriteria
             $this->mergeAcquisitions(
                 $liquidation->clearMovementCollection(
                     $this->acquisitionPersistence,
+                    $this->liquidationPersistence,
                     $this->movementPersistence
                 )
             );
@@ -154,7 +155,7 @@ class FiFoCriteria
         foreach ($this->acquisitionsCollection->toArray() as $acquisition) {
             if ($acquisition->getAmountActionable()->greater(new TransactionAmountActionableVO('0'))) {
                 try {
-                    new Movement($this->movementPersistence, $acquisition, $liquidation);
+                    new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
                 } catch (DomainViolationException $dv) {
                     throw new DomainViolationException(
                         new TranslatableMessage(

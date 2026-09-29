@@ -49,12 +49,14 @@ class Liquidation extends TransactionAbstract
 
     public function clearMovementCollection(
         AcquisitionPersistenceInterface $acquisitionPersistence,
+        LiquidationPersistenceInterface $liquidationPersistence,
         MovementPersistenceInterface $movementPersistence
     ): AcquisitionCollection {
         $updatedAcquisitionsCollection = new AcquisitionCollection([]);
         foreach ($this->movementCollection->toArray() as $movement) {
             $acquisition = $movement->getAcquisition();
             $acquisition->unaccountMovement(
+                $acquisitionPersistence,
                 $movement
             );
             if (false === $updatedAcquisitionsCollection->contains($acquisition)) {
@@ -66,7 +68,7 @@ class Liquidation extends TransactionAbstract
         }
         $this->movementCollection->clear();
         $this->amountActionable = new TransactionAmountActionableVO($this->amount->getValue());
-        $this->liquidationPersistence->persist($this);
+        $liquidationPersistence->persist($this);
 
         return $updatedAcquisitionsCollection;
     }

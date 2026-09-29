@@ -23,6 +23,9 @@ final class ExchangePersistence extends EntityPersistence implements ExchangePer
         parent::__construct($this->managerRegistry, Exchange::class);
     }
 
+    /**
+     * @return ExchangeRepositoryInterface
+     */
     #[\Override]
     public function getRepository(): EntityRepositoryInterface
     {

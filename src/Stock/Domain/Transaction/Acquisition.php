@@ -44,6 +44,7 @@ class Acquisition extends TransactionAbstract
     }
 
     public function accountMovement(
+        AcquisitionPersistenceInterface $acquisitionPersistence,
         Movement $movement
     ): self {
         if (false === $this->sameId($movement->getAcquisition())) {
@@ -51,12 +52,13 @@ class Acquisition extends TransactionAbstract
         }
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->decreaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
-        $this->acquisitionPersistence->persist($this);
+        $acquisitionPersistence->persist($this);
 
         return $this;
     }
 
     public function unaccountMovement(
+        AcquisitionPersistenceInterface $acquisitionPersistence,
         Movement $movement
     ): self {
         if (false === $this->sameId($movement->getAcquisition())) {
@@ -64,7 +66,7 @@ class Acquisition extends TransactionAbstract
         }
         $this->increaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->increaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
-        $this->acquisitionPersistence->persist($this);
+        $acquisitionPersistence->persist($this);
 
         return $this;
     }

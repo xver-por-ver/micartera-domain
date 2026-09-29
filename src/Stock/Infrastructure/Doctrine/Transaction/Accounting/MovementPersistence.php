@@ -34,14 +34,4 @@ final class MovementPersistence extends EntityPersistence implements MovementPer
 
         return $repository;
     }
-
-    private function entityManager(): EntityManager
-    {
-        $manager = $this->managerRegistry->getManager();
-        if (!$manager instanceof EntityManager) {
-            throw new \LogicException('Movement persistence requires a Doctrine ORM entity manager.');
-        }
-
-        return $manager;
-    }
 }

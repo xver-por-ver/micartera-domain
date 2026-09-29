@@ -7,7 +7,9 @@ use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
@@ -28,6 +30,7 @@ class Movement implements EntityInterface
 
     public function __construct(
         MovementPersistenceInterface $movementPersistence,
+        AcquisitionPersistenceInterface $acquisitionPersistence,
         private readonly Acquisition $acquisition,
         private readonly Liquidation $liquidation
     ) {
@@ -40,9 +43,8 @@ class Movement implements EntityInterface
         $this->setLiquidationPrice();
         $this->setAcquisitionExpenses();
         $this->setLiquidationExpenses();
-        $this->acquisition->accountMovement($this);
+        $this->acquisition->accountMovement($acquisitionPersistence, $this);
         $this->liquidation->accountMovement($this);
-        $repoMovement = $movementPersistence->getRepository();
         $movementPersistence->persist($this);
     }
 

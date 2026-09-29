@@ -24,17 +24,19 @@ use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\StockRepositoryInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Criteria\FiFoCriteria;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 
 /**
  * @internal
@@ -65,7 +67,9 @@ class StockOperateCommandTest extends TestCase
     private MovementRepositoryInterface&Stub $repoMovement;
     private AcquisitionRepositoryInterface&Stub $repoAcquisition;
     private LiquidationRepositoryInterface&Stub $repoLiquidation;
-    private TransactionPersistenceInterface&Stub $transactionPersistence;
+    private AcquisitionPersistenceInterface&Stub $acquisitionPersistence;
+    private LiquidationPersistenceInterface&Stub $liquidationPersistence;
+    private MovementPersistenceInterface&Stub $movementPersistence;
     private AccountPersistenceInterface&Stub $accountPersistence;
     private StockPersistenceInterface&Stub $stockPersistence;
 
@@ -76,10 +80,12 @@ class StockOperateCommandTest extends TestCase
         $this->repoMovement = $this->createStub(MovementRepositoryInterface::class);
         $this->repoAcquisition = $this->createStub(AcquisitionRepositoryInterface::class);
         $this->repoLiquidation = $this->createStub(LiquidationRepositoryInterface::class);
-        $this->transactionPersistence = $this->createStub(TransactionPersistenceInterface::class);
-        $this->transactionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
-        $this->transactionPersistence->method('getRepositoryForMovement')->willReturn($this->repoMovement);
-        $this->transactionPersistence->method('getRepositoryForLiquidation')->willReturn($this->repoLiquidation);
+        $this->acquisitionPersistence = $this->createStub(AcquisitionPersistenceInterface::class);
+        $this->acquisitionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
+        $this->liquidationPersistence = $this->createStub(LiquidationPersistenceInterface::class);
+        $this->liquidationPersistence->method('getRepository')->willReturn($this->repoLiquidation);
+        $this->movementPersistence = $this->createStub(MovementPersistenceInterface::class);
+        $this->movementPersistence->method('getRepository')->willReturn($this->repoMovement);
         $this->accountPersistence = $this->createStub(AccountPersistenceInterface::class);
         $this->accountPersistence->method('getRepository')->willReturn($this->repoAccount);
         $this->stockPersistence = $this->createStub(StockPersistenceInterface::class);
@@ -100,7 +106,7 @@ class StockOperateCommandTest extends TestCase
         $this->repoAcquisition->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(true);
         $this->repoStock->method('findByIdOrThrowException')->willReturn($this->stock);
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($this->account);
-        $command = new StockCreatePurchaseCommand($this->transactionPersistence, $this->accountPersistence, $this->stockPersistence);
+        $command = new StockCreatePurchaseCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
         $command->invoke(
             'TEST',
             new \DateTime('now', new \DateTimeZone('UTC')),
@@ -117,7 +123,7 @@ class StockOperateCommandTest extends TestCase
         $uuid = Uuid::v4();
         $transaction = $this->createStub(Acquisition::class);
         $this->repoAcquisition->method('findByIdOrThrowException')->willReturn($transaction);
-        $command = new StockDeletePurchaseCommand($this->transactionPersistence);
+        $command = new StockDeletePurchaseCommand($this->acquisitionPersistence);
         $command->invoke($uuid->toRfc4122());
     }
 
@@ -144,7 +150,7 @@ class StockOperateCommandTest extends TestCase
         $uuid = Uuid::v4();
         $transaction = $this->createStub(Liquidation::class);
         $this->repoLiquidation->method('findByIdOrThrowException')->willReturn($transaction);
-        $command = new StockDeleteSellCommand($this->transactionPersistence);
+        $command = new StockDeleteSellCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $command->invoke($uuid->toRfc4122());
     }
 }

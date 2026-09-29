@@ -38,7 +38,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -63,7 +65,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(Acquisition::class)]
 #[UsesClass(AcquisitionCollection::class)]
 #[UsesClass(FiFoCriteria::class)]
-#[UsesClass(TransactionPersistence::class)]
+#[UsesClass(AcquisitionPersistence::class)]
+#[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementPersistence::class)]
 #[UsesClass(TransactionAbstract::class)]
 #[UsesClass(TransactionAmountActionableVO::class)]
 #[UsesClass(TransactionExpenseVO::class)]

@@ -40,7 +40,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 
 /**
  * @internal
@@ -65,7 +67,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionP
 #[UsesClass(FiFoCriteria::class)]
 #[UsesClass(Liquidation::class)]
 #[UsesClass(LiquidationCollection::class)]
-#[UsesClass(TransactionPersistence::class)]
+#[UsesClass(AcquisitionPersistence::class)]
+#[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementPersistence::class)]
 #[UsesClass(TransactionAbstract::class)]
 #[UsesClass(TransactionAmountActionableVO::class)]
 #[UsesClass(TransactionAmountVO::class)]
@@ -84,7 +88,7 @@ class StockOperateCommandTest extends IntegrationTestCase
     public function testPurchaseCommandSucceeds(): void
     {
         self::$loadFixtures = true;
-        $command = new StockCreatePurchaseCommand(new TransactionPersistence(self::$registry), new AccountPersistence(self::$registry), new StockPersistence(self::$registry));
+        $command = new StockCreatePurchaseCommand(new AcquisitionPersistence(self::$registry), new LiquidationPersistence(self::$registry), new MovementPersistence(self::$registry), new AccountPersistence(self::$registry), new StockPersistence(self::$registry));
         $acquisition = $command->invoke(
             'CABK',
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
@@ -98,7 +102,7 @@ class StockOperateCommandTest extends IntegrationTestCase
 
     public function testSellCommandSucceeds(): void
     {
-        $command = new StockCreateSellCommand(new TransactionPersistence(self::$registry), new AccountPersistence(self::$registry), new StockPersistence(self::$registry));
+        $command = new StockCreateSellCommand(new LiquidationPersistence(self::$registry), new AcquisitionPersistence(self::$registry), new MovementPersistence(self::$registry), new AccountPersistence(self::$registry), new StockPersistence(self::$registry));
         $liquidation = $command->invoke(
             'CABK',
             new \DateTime('yesterday', new \DateTimeZone('UTC')),

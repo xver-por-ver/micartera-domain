@@ -17,8 +17,8 @@ use Xver\MiCartera\Domain\Stock\Application\Query\Portfolio\PortfolioQuery;
 use Xver\MiCartera\Domain\Stock\Domain\Portfolio\SummaryVO;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockRepositoryInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterface;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 
 /**
  * @internal
@@ -34,7 +34,7 @@ class PortfolioQueryTest extends TestCase
     private AcquisitionRepositoryInterface&Stub $repoAcquisition;
     private StockPersistenceInterface&Stub $stockPersistence;
     private AccountPersistenceInterface&Stub $accountPersistence;
-    private Stub&TransactionPersistenceInterface $transactionPersistence;
+    private Stub&AcquisitionPersistenceInterface $acquisitionPersistence;
 
     public function setUp(): void
     {
@@ -45,20 +45,20 @@ class PortfolioQueryTest extends TestCase
         $this->stockPersistence->method('getRepository')->willReturn($this->repoStock);
         $this->accountPersistence = $this->createStub(AccountPersistenceInterface::class);
         $this->accountPersistence->method('getRepository')->willReturn($this->repoAccount);
-        $this->transactionPersistence = $this->createStub(TransactionPersistenceInterface::class);
-        $this->transactionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
+        $this->acquisitionPersistence = $this->createStub(AcquisitionPersistenceInterface::class);
+        $this->acquisitionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
     }
 
     public function testQueryCommandSucceeds(): void
     {
-        $query = new PortfolioQuery($this->stockPersistence, $this->accountPersistence, $this->transactionPersistence);
+        $query = new PortfolioQuery($this->stockPersistence, $this->accountPersistence, $this->acquisitionPersistence);
         $portfolioDTO = $query->getPortfolio('test@example.com');
         $this->assertInstanceOf(PortfolioDTO::class, $portfolioDTO);
     }
 
     public function testGetStockPortfolioSummary(): void
     {
-        $query = new PortfolioQuery($this->stockPersistence, $this->accountPersistence, $this->transactionPersistence);
+        $query = new PortfolioQuery($this->stockPersistence, $this->accountPersistence, $this->acquisitionPersistence);
         $summaryVO = $query->getStockPortfolioSummary('test@example.com', 'TEST');
         $this->assertInstanceOf(SummaryVO::class, $summaryVO);
     }

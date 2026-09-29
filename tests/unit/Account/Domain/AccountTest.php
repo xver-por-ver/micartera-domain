@@ -73,7 +73,7 @@ class AccountTest extends TestCase
     {
         $this->repoCurrency->method('findById')->willReturn(null);
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('relatedEntityNotPersisted');
+        $this->expectExceptionMessageIs('relatedEntityNotPersisted');
         new Account($this->accountPeristence, 'test@example.com', 'password', $this->currency, self::$timezone, ['ROLE_ADMIN']);
     }
 
@@ -82,16 +82,16 @@ class AccountTest extends TestCase
         $this->repoCurrency->method('findById')->willReturn($this->createStub(Currency::class));
         $this->repoAccount->method('findByIdentifier')->willReturn($this->createStub(Account::class));
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('accountEmailExists');
+        $this->expectExceptionMessageIs('accountEmailExists');
         new Account($this->accountPeristence, 'test@example.com', 'password', $this->currency, self::$timezone, ['ROLE_ADMIN']);
     }
 
     public function testExceptionIsThrownOnCommitFail(): void
     {
-        $this->repoAccount->method('persist')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->accountPeristence->method('persist')->willThrowException(new \Exception('simulating uncached exception'));
         $this->repoCurrency->method('findById')->willReturn($this->currency);
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
+        $this->expectExceptionMessageIs('simulating uncached exception');
         new Account($this->accountPeristence, 'test@example.com', 'password', $this->currency, self::$timezone, ['ROLE_ADMIN']);
     }
 
@@ -113,7 +113,7 @@ class AccountTest extends TestCase
     {
         $this->repoCurrency->method('findById')->willReturn($this->currency);
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('invalidUserRole');
+        $this->expectExceptionMessageIs('invalidUserRole');
         new Account($this->accountPeristence, 'test@example.com', 'password', $this->currency, self::$timezone, ['ROLE_NOEXISTS']);
     }
 }

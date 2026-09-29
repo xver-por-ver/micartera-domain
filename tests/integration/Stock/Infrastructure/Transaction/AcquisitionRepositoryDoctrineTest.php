@@ -41,7 +41,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -71,7 +73,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(Liquidation::class)]
 #[UsesClass(TransactionAmountActionableVO::class)]
 #[UsesClass(TransactionAmountVO::class)]
-#[UsesClass(TransactionPersistence::class)]
+#[UsesClass(AcquisitionPersistence::class)]
+#[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementPersistence::class)]
 #[UsesClass(AccountRepository::class)]
 #[UsesClass(MovementRepository::class)]
 #[UsesClass(CurrencyRepository::class)]
@@ -83,7 +87,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(StockProfitVO::class)]
 class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
 {
-    private TransactionPersistence $transactionPersistence;
+    private AcquisitionPersistence $acquisitionPersistence;
+    private LiquidationPersistence $liquidationPersistence;
+    private MovementPersistence $movementPersistence;
     private Account $account;
     private Account $account2;
     private Stock $stock;
@@ -94,7 +100,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
     protected function resetEntityManager(): void
     {
         parent::resetEntityManager();
-        $this->transactionPersistence = new TransactionPersistence(self::$registry);
+        $this->acquisitionPersistence = new AcquisitionPersistence(self::$registry);
+        $this->liquidationPersistence = new LiquidationPersistence(self::$registry);
+        $this->movementPersistence = new MovementPersistence(self::$registry);
         $repoAccount = new AccountRepository(self::$registry);
         $repoStock = new StockRepository(self::$registry);
         $this->account = $repoAccount->findByIdentifier('test@example.com');
@@ -109,7 +117,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
     {
         $amount = new TransactionAmountVO('399');
         $transaction = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
@@ -122,19 +132,21 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         $this->assertSame($amount->getValue(), $transaction->getAmount()->getValue());
         $transactionId = $transaction->getId();
         parent::detachEntity($transaction);
-        $transaction = $this->transactionPersistence->getRepository()->findByIdOrThrowException($transactionId);
+        $transaction = $this->acquisitionPersistence->getRepository()->findByIdOrThrowException($transactionId);
         $this->assertInstanceOf(Acquisition::class, $transaction);
         $this->assertEquals($transactionId, $transaction->getId());
-        $transaction->persistRemove($this->transactionPersistence);
+        $transaction->persistRemove($this->acquisitionPersistence);
         parent::detachEntity($transaction);
-        $this->assertSame(null, $this->transactionPersistence->getRepository()->findById($transactionId));
+        $this->assertSame(null, $this->acquisitionPersistence->getRepository()->findById($transactionId));
     }
 
     public function testfindById(): void
     {
         parent::$loadFixtures = true;
         $transaction = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
@@ -144,20 +156,22 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         );
         $transactionId = $transaction->getId();
         parent::detachEntity($transaction);
-        $this->assertInstanceOf(Acquisition::class, $this->transactionPersistence->getRepository()->findById($transactionId));
+        $this->assertInstanceOf(Acquisition::class, $this->acquisitionPersistence->getRepository()->findById($transactionId));
         $this->assertSame($transactionId, $transaction->getId());
     }
 
     public function testfindByIdWithNonExistingReturnsNull(): void
     {
-        $this->assertNull($this->transactionPersistence->getRepository()->findById(Uuid::v4()));
+        $this->assertNull($this->acquisitionPersistence->getRepository()->findById(Uuid::v4()));
     }
 
     public function testfindByIdOrThrowException(): void
     {
         parent::$loadFixtures = true;
         $transaction = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
@@ -167,7 +181,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         );
         $transactionId = $transaction->getId();
         parent::detachEntity($transaction);
-        $this->assertInstanceOf(Acquisition::class, $this->transactionPersistence->getRepository()->findByIdOrThrowException($transactionId));
+        $this->assertInstanceOf(Acquisition::class, $this->acquisitionPersistence->getRepository()->findByIdOrThrowException($transactionId));
     }
 
     public function testfindByIdOrThrowExceptionWithNonExistingThrowsException(): void
@@ -175,7 +189,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         try {
             $entity = 'Acquisition';
             $uuid = Uuid::v4();
-            $this->transactionPersistence->getRepository()->findByIdOrThrowException($uuid);
+            $this->acquisitionPersistence->getRepository()->findByIdOrThrowException($uuid);
         } catch (EntityNotFoundException $th) {
             $this->assertSame('entityNotFound', $th->getTranslatableMessage()->getMessage());
             $this->assertSame(['entity' => $entity, 'identifier' => $uuid->toString()], $th->getTranslatableMessage()->getParameters());
@@ -186,11 +200,13 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
     public function testFindByStockId(): void
     {
         parent::$loadFixtures = true;
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByStockId($this->stock2, 20, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByStockId($this->stock2, 20, 0);
         $this->assertInstanceOf(AcquisitionCollection::class, $transactionsCollection);
         $this->assertSame(0, $transactionsCollection->count());
         new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('2 hours ago', new \DateTimeZone('UTC')),
@@ -199,7 +215,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->account
         );
         new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('1 hour ago', new \DateTimeZone('UTC')),
@@ -207,12 +225,12 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->expenses,
             $this->account
         );
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByStockId($this->stock2, 20, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByStockId($this->stock2, 20, 0);
         $this->assertSame(2, $transactionsCollection->count());
         foreach ($transactionsCollection->toArray() as $transaction) {
             $this->assertSame($this->stock2->getId(), $transaction->getStock()->getId());
         }
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByStockId($this->stock2, 1, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByStockId($this->stock2, 1, 0);
         $this->assertSame(1, $transactionsCollection->count());
     }
 
@@ -221,7 +239,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         /** @var Stock&Stub */
         $stock = $this->createStub(Stock::class);
         $stock->method('getId')->willReturn('NONEXISTENT');
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByStockId($stock, 2, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByStockId($stock, 2, 0);
         $this->assertInstanceOf(AcquisitionCollection::class, $transactionsCollection);
         $this->assertSame(0, $transactionsCollection->count());
     }
@@ -231,7 +249,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         parent::$loadFixtures = true;
         $date = new \DateTime('5 hours ago', new \DateTimeZone('UTC'));
         new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             $date,
@@ -242,7 +262,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('transExistsOnDateTime');
         new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             $date,
@@ -256,7 +278,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
     {
         parent::$loadFixtures = true;
         $transaction = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock3,
             $this->stock3->getPrice(),
             new \DateTime('90 minutes ago', new \DateTimeZone('UTC')),
@@ -265,7 +289,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->account
         );
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock3,
             $this->stock3->getPrice(),
             new \DateTime('89 minutes ago', new \DateTimeZone('UTC')),
@@ -275,14 +301,16 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         );
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('transBuyCannotBeRemovedWithoutFullAmountOutstanding');
-        $transaction->persistRemove($this->transactionPersistence);
+        $transaction->persistRemove($this->acquisitionPersistence);
     }
 
     public function testFindByAccountWithActionableAmount(): void
     {
         parent::$loadFixtures = true;
         $transaction1 = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('2021-09-21 09:44:12', new \DateTimeZone('UTC')),
@@ -291,7 +319,9 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->account2
         );
         $transaction2 = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('2021-09-23 10:51:21s', new \DateTimeZone('UTC')),
@@ -299,33 +329,33 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->expenses,
             $this->account2
         );
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByAccountWithActionableAmount($this->account2, 'ASC', 'datetimeutc', 0, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByAccountWithActionableAmount($this->account2, 'ASC', 'datetimeutc', 0, 0);
         $this->assertSame(2, $transactionsCollection->count());
         $this->assertInstanceOf(Acquisition::class, $transactionsCollection->offsetGet(0));
         $this->assertInstanceOf(Acquisition::class, $transactionsCollection->offsetGet(1));
         $this->assertEquals($transaction1->getId(), $transactionsCollection->offsetGet(0)->getId());
         $this->assertEquals($transaction2->getId(), $transactionsCollection->offsetGet(1)->getId());
 
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByAccountWithActionableAmount($this->account2, 'DESC', 'datetimeutc', 0, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByAccountWithActionableAmount($this->account2, 'DESC', 'datetimeutc', 0, 0);
         $this->assertSame(2, $transactionsCollection->count());
         $this->assertInstanceOf(Acquisition::class, $transactionsCollection->offsetGet(0));
         $this->assertInstanceOf(Acquisition::class, $transactionsCollection->offsetGet(1));
         $this->assertEquals($transaction2->getId(), $transactionsCollection->offsetGet(0)->getId());
         $this->assertEquals($transaction1->getId(), $transactionsCollection->offsetGet(1)->getId());
 
-        $transactionsCollection = $this->transactionPersistence->getRepository()->findByAccountWithActionableAmount($this->account2, 'ASC', 'datetimeutc', 1, 0);
+        $transactionsCollection = $this->acquisitionPersistence->getRepository()->findByAccountWithActionableAmount($this->account2, 'ASC', 'datetimeutc', 1, 0);
         $this->assertSame(1, $transactionsCollection->count());
     }
 
     public function testPortfolioSummary(): void
     {
-        $summary = $this->transactionPersistence->getRepository()->portfolioSummary($this->account);
+        $summary = $this->acquisitionPersistence->getRepository()->portfolioSummary($this->account);
         $this->assertInstanceOf(SummaryVO::class, $summary);
     }
 
     public function testStockPortfolioSummary(): void
     {
-        $summary = $this->transactionPersistence->getRepository()->portfolioSummary($this->account, $this->stock);
+        $summary = $this->acquisitionPersistence->getRepository()->portfolioSummary($this->account, $this->stock);
         $this->assertInstanceOf(SummaryVO::class, $summary);
     }
 }

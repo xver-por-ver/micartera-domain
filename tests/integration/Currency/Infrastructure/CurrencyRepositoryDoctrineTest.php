@@ -37,7 +37,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 
 /**
@@ -63,7 +65,9 @@ use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 #[UsesClass(TransactionExpenseVO::class)]
 #[UsesClass(AcquisitionCollection::class)]
 #[UsesClass(FiFoCriteria::class)]
-#[UsesClass(TransactionPersistence::class)]
+#[UsesClass(AcquisitionPersistence::class)]
+#[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementPersistence::class)]
 #[UsesClass(TransactionAbstract::class)]
 #[UsesClass(TransactionAmountVO::class)]
 #[UsesClass(TransactionAmountActionableVO::class)]
@@ -88,7 +92,7 @@ class CurrencyRepositoryDoctrineTest extends IntegrationTestCase
     {
         parent::$loadFixtures = true;
         $currency = new Currency($this->currencyPersistence, 'GBP', '£', 2);
-        $this->currencyPersistence->getRepository()->persist($currency);
+        $this->currencyPersistence->persist($currency);
         parent::detachEntity($currency);
         $this->assertInstanceOf(Currency::class, $this->currencyPersistence->getRepository()->findById($currency->getIso3()));
     }
@@ -109,9 +113,9 @@ class CurrencyRepositoryDoctrineTest extends IntegrationTestCase
 
     public function testCurrencyIsFoundByIdOrThrowsExceptionWhenNotFoundWillThrowException(): void
     {
+        $entity = 'Currency';
+        $id = 'XXX';
         try {
-            $entity = 'Currency';
-            $id = 'XXX';
             $this->currencyPersistence->getRepository()->findByIdOrThrowException($id);
         } catch (EntityNotFoundException $th) {
             $this->assertSame('entityNotFound', $th->getTranslatableMessage()->getMessage());

@@ -17,9 +17,9 @@ use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting\AccountingDTO;
 use Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting\AccountingQuery;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\SummaryVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 
 /**
  * @internal
@@ -33,7 +33,7 @@ class AccountingQueryTest extends TestCase
     private AccountRepositoryInterface&Stub $repoAccount;
     private MovementRepositoryInterface&Stub $repoMovement;
     private AccountPersistenceInterface&Stub $accountPersistence;
-    private Stub&TransactionPersistenceInterface $transactionPersistence;
+    private Stub&MovementPersistenceInterface $movementPersistence;
 
     public function setUp(): void
     {
@@ -41,8 +41,8 @@ class AccountingQueryTest extends TestCase
         $this->repoMovement = $this->createStub(MovementRepositoryInterface::class);
         $this->accountPersistence = $this->createStub(AccountPersistenceInterface::class);
         $this->accountPersistence->method('getRepository')->willReturn($this->repoAccount);
-        $this->transactionPersistence = $this->createStub(TransactionPersistenceInterface::class);
-        $this->transactionPersistence->method('getRepositoryForMovement')->willReturn($this->repoMovement);
+        $this->movementPersistence = $this->createStub(MovementPersistenceInterface::class);
+        $this->movementPersistence->method('getRepository')->willReturn($this->repoMovement);
     }
 
     #[DataProvider('displayedYear')]
@@ -55,7 +55,7 @@ class AccountingQueryTest extends TestCase
             $this->createStub(MovementCollection::class)
         );
         $this->repoMovement->method('accountingSummaryByAccount')->willReturn($this->createStub(SummaryVO::class));
-        $query = new AccountingQuery($this->accountPersistence, $this->transactionPersistence);
+        $query = new AccountingQuery($this->accountPersistence, $this->movementPersistence);
         $accountingDTO = $query->byAccountYear(
             'test@example.com',
             $displayedYear

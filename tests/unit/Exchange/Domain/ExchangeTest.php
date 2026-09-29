@@ -34,7 +34,7 @@ class ExchangeTest extends TestCase
     {
         $this->repoExchange->method('findById')->willReturn($this->createStub(Exchange::class));
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('ExchangeExists');
+        $this->expectExceptionMessageIs('ExchangeExists');
         new Exchange($this->exchangePersitence, 'CODE', 'NAME');
     }
 
@@ -52,7 +52,7 @@ class ExchangeTest extends TestCase
     public function testInvalidCodeThrowExceptions($testCode): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('stringLength');
+        $this->expectExceptionMessageIs('stringLength');
         new Exchange($this->exchangePersitence, $testCode, 'NAME');
     }
 
@@ -68,7 +68,7 @@ class ExchangeTest extends TestCase
     public function testExchangeNameFormat($name): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('stringLength');
+        $this->expectExceptionMessageIs('stringLength');
         new Exchange($this->exchangePersitence, 'CODE', $name);
     }
 
@@ -99,9 +99,9 @@ class ExchangeTest extends TestCase
 
     public function testExceptionIsThrownOnCommitFail(): void
     {
-        $this->repoExchange->method('persist')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->exchangePersitence->method('persist')->willThrowException(new \Exception('simulating uncached exception'));
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
+        $this->expectExceptionMessageIs('simulating uncached exception');
         new Exchange($this->exchangePersitence, 'CODE', 'NAME');
     }
 }

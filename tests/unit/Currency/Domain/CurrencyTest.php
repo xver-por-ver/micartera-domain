@@ -37,7 +37,7 @@ class CurrencyTest extends TestCase
     {
         $this->repoCurrency->method('findById')->willReturn($this->createStub(Currency::class));
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('currencyCodeAlreadyExists');
+        $this->expectExceptionMessageIs('currencyCodeAlreadyExists');
         new Currency($this->currencyPersistence, 'EUR', '€', 2);
     }
 
@@ -57,7 +57,7 @@ class CurrencyTest extends TestCase
     public function testInvalidCodeThrowExceptions($testCode): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('invalidIso3');
+        $this->expectExceptionMessageIs('invalidIso3');
         new Currency($this->currencyPersistence, $testCode, '€', 2);
     }
 
@@ -75,7 +75,7 @@ class CurrencyTest extends TestCase
     public function testInvalidSymbolThrowExceptions($testSymbol): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('invalidCurrencySymbol');
+        $this->expectExceptionMessageIs('invalidCurrencySymbol');
         new Currency($this->currencyPersistence, 'ABC', $testSymbol, 2);
     }
 
@@ -91,7 +91,7 @@ class CurrencyTest extends TestCase
     public function testInvalidPrecisionThrowExceptions($testPrecision): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('enterNumberBetween');
+        $this->expectExceptionMessageIs('enterNumberBetween');
         new Currency($this->currencyPersistence, 'ABC', '€', $testPrecision);
     }
 
@@ -119,9 +119,9 @@ class CurrencyTest extends TestCase
 
     public function testExceptionIsThrownOnCommitFail(): void
     {
-        $this->repoCurrency->method('persist')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->currencyPersistence->method('persist')->willThrowException(new \Exception('simulating uncached exception'));
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
+        $this->expectExceptionMessageIs('simulating uncached exception');
         new Currency($this->currencyPersistence, 'EUR', '€', 2);
     }
 }

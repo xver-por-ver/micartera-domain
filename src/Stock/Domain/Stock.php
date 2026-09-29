@@ -137,8 +137,8 @@ class Stock implements EntityInterface
                 'stock.code'
             );
         }
-        $repoStock->persist($this);
-        $repoStock->flush();
+        $this->stockPersistence->persist($this);
+        $this->stockPersistence->flush();
     }
 
     public function persistUpdate(
@@ -153,8 +153,8 @@ class Stock implements EntityInterface
         ;
         $this->price = $price;
         $repoStock = $stockPersistence->getRepository();
-        $repoStock->persist($this);
-        $repoStock->flush();
+        $stockPersistence->persist($this);
+        $stockPersistence->flush();
 
         return $this;
     }
@@ -174,7 +174,7 @@ class Stock implements EntityInterface
             );
         }
         $repoStock = $stockPersistence->getRepository();
-        $repoStock->remove($this);
-        $repoStock->flush();
+        $stockPersistence->remove($this);
+        $stockPersistence->flush();
     }
 }

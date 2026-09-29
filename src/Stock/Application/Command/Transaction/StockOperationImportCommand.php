@@ -5,7 +5,9 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -15,7 +17,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 class StockOperationImportCommand
 {
     public function __construct(
-        private TransactionPersistenceInterface $transactionPersistence,
+        private AcquisitionPersistenceInterface $acquisitionPersistence,
+        private LiquidationPersistenceInterface $liquidationPersistence,
+        private MovementPersistenceInterface $movementPersistence,
         private AccountPersistenceInterface $accountPersistence,
         private StockPersistenceInterface $stockPersistence
     ) {}
@@ -40,8 +44,8 @@ class StockOperationImportCommand
             }
             $command
                 = 'acquisition' === $type
-                ? new StockCreatePurchaseCommand($this->transactionPersistence, $this->accountPersistence, $this->stockPersistence)
-                : new StockCreateSellCommand($this->transactionPersistence, $this->accountPersistence, $this->stockPersistence);
+                ? new AcquisitionCreateCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence)
+                : new LiquidationCreateCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
             $command->invoke(
                 $line[2],
                 $dateTime,

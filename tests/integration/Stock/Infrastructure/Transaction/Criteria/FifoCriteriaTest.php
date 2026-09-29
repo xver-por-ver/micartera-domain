@@ -39,7 +39,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
 /**
@@ -65,7 +67,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(AcquisitionCollection::class)]
 #[UsesClass(Liquidation::class)]
 #[UsesClass(LiquidationCollection::class)]
-#[UsesClass(TransactionPersistence::class)]
+#[UsesClass(AcquisitionPersistence::class)]
+#[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementPersistence::class)]
 #[UsesClass(TransactionAbstract::class)]
 #[UsesClass(TransactionAmountActionableVO::class)]
 #[UsesClass(AccountRepository::class)]
@@ -83,7 +87,9 @@ class FifoCriteriaTest extends IntegrationTestCase
     private Stock $stock;
     private Stock $stock2;
     private TransactionExpenseVO $expenses;
-    private TransactionPersistence $transactionPersistence;
+    private AcquisitionPersistence $acquisitionPersistence;
+    private LiquidationPersistence $liquidationPersistence;
+    private MovementPersistence $movementPersistence;
 
     protected function resetEntityManager(): void
     {
@@ -94,7 +100,9 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->stock = $repoStock->findByIdOrThrowException('CABK');
         $this->stock2 = $repoStock->findByIdOrThrowException('SAN');
         $this->expenses = new TransactionExpenseVO('4.56', $this->account->getCurrency());
-        $this->transactionPersistence = new TransactionPersistence(self::$registry);
+        $this->acquisitionPersistence = new AcquisitionPersistence(self::$registry);
+        $this->liquidationPersistence = new LiquidationPersistence(self::$registry);
+        $this->movementPersistence = new MovementPersistence(self::$registry);
     }
 
     public function testNoAcquistionBeforeDateThrowsException(): void
@@ -102,7 +110,9 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('transNotPassFifoSpec');
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('last year', new \DateTimeZone('UTC')),
@@ -117,7 +127,9 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('transNotPassFifoSpec');
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
@@ -131,7 +143,9 @@ class FifoCriteriaTest extends IntegrationTestCase
     {
         parent::$loadFixtures = true;
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
@@ -142,7 +156,9 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('transNotPassFifoSpec');
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('40 minutes ago', new \DateTimeZone('UTC')),
@@ -164,7 +180,9 @@ class FifoCriteriaTest extends IntegrationTestCase
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
         // Test create acquisition generating no accounting movements
         $acquisitions[0] = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT60M')),
@@ -173,7 +191,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->account
         );
         $expectedMovements = [];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountVO('1000'),
         ];
@@ -181,7 +199,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         // Test create liquidation requiring no accounting movements rearrangements
         $liquidations[0] = new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT30M')),
@@ -192,7 +212,7 @@ class FifoCriteriaTest extends IntegrationTestCase
         $expectedMovements = [
             0 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('500')],
         ];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountVO('500'),
         ];
@@ -200,7 +220,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         // Test create acquisition requiring accounting movement rearrangement
         $acquisitions[1] = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT90M')),
@@ -212,7 +234,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('200')],
             1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('300')],
         ];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountActionableVO('700'),
             1 => new TransactionAmountActionableVO('0'),
@@ -221,7 +243,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         // Test create liquidation requiring accounting movement rearrangement
         $liquidations[1] = new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT86M')),
@@ -234,7 +258,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             1 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('100')],
             2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('400')],
         ];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountActionableVO('600'),
             1 => new TransactionAmountActionableVO('0'),
@@ -243,7 +267,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         // Test create other liquidation requiring accounting movement rearrangement
         $liquidations[2] = new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT31M')),
@@ -257,7 +283,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('400')],
             3 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('500')],
         ];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountActionableVO('100'),
             1 => new TransactionAmountActionableVO('0'),
@@ -265,13 +291,13 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
         // Test remove liquidation requiring accounting movements rearrangement
-        $liquidations[1]->persistRemove($this->transactionPersistence);
+        $liquidations[1]->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $expectedMovements = [
             0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('200')],
             1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('300')],
             2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('500')],
         ];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountActionableVO('200'),
             1 => new TransactionAmountActionableVO('0'),
@@ -279,12 +305,12 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
         // Test remove other liquidation not requiring accounting movements rearrangement
-        $liquidations[0]->persistRemove($this->transactionPersistence);
+        $liquidations[0]->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $expectedMovements = [
             0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('200')],
             1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('300')],
         ];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountActionableVO('700'),
             1 => new TransactionAmountActionableVO('0'),
@@ -293,7 +319,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         // Test add acquisition not requiring rearrangement
         $acquisitions[2] = new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT20M')),
@@ -301,7 +329,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->expenses,
             $this->account
         );
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
             0 => new TransactionAmountActionableVO('700'),
             1 => new TransactionAmountActionableVO('0'),
@@ -315,7 +343,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         try {
             new Liquidation(
-                $this->transactionPersistence,
+                $this->liquidationPersistence,
+                $this->acquisitionPersistence,
+                $this->movementPersistence,
                 $this->stock2,
                 $this->stock2->getPrice(),
                 (clone $acquisitions[1]->getDateTimeUtc())->sub(new \DateInterval('PT30S')),
@@ -333,7 +363,9 @@ class FifoCriteriaTest extends IntegrationTestCase
 
         try {
             new Liquidation(
-                $this->transactionPersistence,
+                $this->liquidationPersistence,
+                $this->acquisitionPersistence,
+                $this->movementPersistence,
                 $this->stock2,
                 $this->stock2->getPrice(),
                 (clone $liquidations[2]->getDateTimeUtc())->sub(new \DateInterval('PT30S')),
@@ -352,15 +384,17 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->assertSame(2, $exceptionsMessagesCorrect);
 
         // Test remove liquidation not requiring rearrangement
-        $this->transactionPersistence->getRepositoryForLiquidation()->findById($liquidations[2]->getId())->persistRemove($this->transactionPersistence);
+        $this->liquidationPersistence->getRepository()->findById($liquidations[2]->getId())->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $expectedMovements = [];
-        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->transactionPersistence->getRepositoryForMovement()));
+        $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
 
         // Test adding liquidation requiring accounting movements rearrangement
         // causes existing liquidation not find acquistions with enough
         // amount outstanding
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT50M')),
@@ -369,7 +403,9 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->account
         );
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT25M')),
@@ -380,7 +416,9 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('transNotPassFifoSpec');
         new Liquidation(
-            $this->transactionPersistence,
+            $this->liquidationPersistence,
+            $this->acquisitionPersistence,
+            $this->movementPersistence,
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT55M')),

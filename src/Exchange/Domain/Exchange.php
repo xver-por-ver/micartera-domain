@@ -96,7 +96,7 @@ class Exchange implements EntityInterface
                 'exchange.code'
             );
         }
-        $repoExchange->persist($this);
-        $repoExchange->flush();
+        $this->exchangePersistence->persist($this);
+        $this->exchangePersistence->flush();
     }
 }

@@ -19,16 +19,18 @@ use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAbstract;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -59,8 +61,10 @@ class LiquidationTest extends TestCase
     private Account&Stub $account;
     private MovementRepositoryInterface&Stub $repoMovement;
     private AcquisitionRepositoryInterface&Stub $repoAcquisition;
-    private LiquidationRepositoryInterface&MockObject $repoLiquidation;
-    private Stub&TransactionPersistenceInterface $transactionPersistence;
+    private LiquidationRepositoryInterface&Stub $repoLiquidation;
+    private AcquisitionPersistenceInterface&Stub $acquisitionPersistence;
+    private LiquidationPersistenceInterface&MockObject $liquidationPersistence;
+    private MovementPersistenceInterface&Stub $movementPersistence;
 
     public static function setUpBeforeClass(): void
     {
@@ -72,12 +76,14 @@ class LiquidationTest extends TestCase
     {
         $this->repoMovement = $this->createStub(MovementRepositoryInterface::class);
         $this->repoAcquisition = $this->createStub(AcquisitionRepositoryInterface::class);
-        $this->repoLiquidation = $this->createMock(LiquidationRepositoryInterface::class);
+        $this->repoLiquidation = $this->createStub(LiquidationRepositoryInterface::class);
         $this->repoLiquidation->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(true);
-        $this->transactionPersistence = $this->createStub(TransactionPersistenceInterface::class);
-        $this->transactionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
-        $this->transactionPersistence->method('getRepositoryForMovement')->willReturn($this->repoMovement);
-        $this->transactionPersistence->method('getRepositoryForLiquidation')->willReturn($this->repoLiquidation);
+        $this->acquisitionPersistence = $this->createStub(AcquisitionPersistenceInterface::class);
+        $this->acquisitionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
+        $this->liquidationPersistence = $this->createMock(LiquidationPersistenceInterface::class);
+        $this->liquidationPersistence->method('getRepository')->willReturn($this->repoLiquidation);
+        $this->movementPersistence = $this->createStub(MovementPersistenceInterface::class);
+        $this->movementPersistence->method('getRepository')->willReturn($this->repoMovement);
         $this->currency = $this->createStub(Currency::class);
         $this->currency->method('sameId')->willReturn(true);
         $this->currency->method('getDecimals')->willReturn(2);
@@ -93,13 +99,13 @@ class LiquidationTest extends TestCase
 
     public function testCreate(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('beginTransaction');
-        $this->repoLiquidation->expects($this->once())->method('persist');
-        $this->repoLiquidation->expects($this->once())->method('flush');
-        $this->repoLiquidation->expects($this->once())->method('commit');
+        $this->liquidationPersistence->expects($this->once())->method('beginTransaction');
+        $this->liquidationPersistence->expects($this->once())->method('persist');
+        $this->liquidationPersistence->expects($this->once())->method('flush');
+        $this->liquidationPersistence->expects($this->once())->method('commit');
 
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction->expects($this->never())->method('fiFoCriteriaInstance');
         $this->assertInstanceOf(Liquidation::class, $transaction);
@@ -118,36 +124,36 @@ class LiquidationTest extends TestCase
 
     public function testCreateWithSameAccountStockAndDatetimeWillThrowException(): void
     {
-        $this->repoLiquidation->expects($this->never())->method('persist');
+        $this->liquidationPersistence->expects($this->never())->method('persist');
         $repoLiquidation = $this->createStub(LiquidationRepositoryInterface::class);
         $repoLiquidation->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(false);
-        $transactionPersistence = $this->createStub(TransactionPersistenceInterface::class);
-        $transactionPersistence->method('getRepositoryForLiquidation')->willReturn($repoLiquidation);
+        $liquidationPersistence = $this->createStub(LiquidationPersistenceInterface::class);
+        $liquidationPersistence->method('getRepository')->willReturn($repoLiquidation);
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('transExistsOnDateTime');
+        $this->expectExceptionMessageIs('transExistsOnDateTime');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
     public function testDateInFutureThrowsException(): void
     {
-        $this->repoLiquidation->expects($this->never())->method('persist');
+        $this->liquidationPersistence->expects($this->never())->method('persist');
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('futureDateNotAllowed');
+        $this->expectExceptionMessageIs('futureDateNotAllowed');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), new \DateTime('tomorrow', new \DateTimeZone('UTC')), self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), new \DateTime('tomorrow', new \DateTimeZone('UTC')), self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
     #[DataProvider('invalidAmount')]
     public function testInvalidAmountFormatThrowsException(string $transAmount): void
     {
-        $this->repoLiquidation->expects($this->never())->method('persist');
+        $this->liquidationPersistence->expects($this->never())->method('persist');
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('enterNumberBetween');
+        $this->expectExceptionMessageIs('enterNumberBetween');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, new TransactionAmountVO($transAmount), $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, new TransactionAmountVO($transAmount), $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
@@ -162,26 +168,26 @@ class LiquidationTest extends TestCase
 
     public function testMovementWithWrongLiquidationThrowsException(): void
     {
-        $this->repoLiquidation->expects($this->exactly(2))->method('persist');
+        $this->liquidationPersistence->expects($this->exactly(2))->method('persist');
         $transaction1 = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction1->expects($this->never())->method('fiFoCriteriaInstance');
         $transaction2 = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction2->expects($this->never())->method('fiFoCriteriaInstance');
         $movement = $this->createStub(Movement::class);
         $movement->method('getLiquidation')->willReturn($transaction2);
         $this->expectException(\InvalidArgumentException::class);
-        $transaction1->accountMovement($this->transactionPersistence->getRepositoryForLiquidation(), $movement);
+        $transaction1->accountMovement($this->liquidationPersistence, $movement);
     }
 
     public function testSameIdWithIncorrectEntityArgumentThrowsException(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('persist');
+        $this->liquidationPersistence->expects($this->once())->method('persist');
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction->expects($this->never())->method('fiFoCriteriaInstance');
         $entity = new class implements EntityInterface {
@@ -196,30 +202,30 @@ class LiquidationTest extends TestCase
 
     public function testWrongExpensesCurrencyThrowsException(): void
     {
-        $this->repoLiquidation->expects($this->never())->method('persist');
+        $this->liquidationPersistence->expects($this->never())->method('persist');
         $expenses = $this->createStub(TransactionExpenseVO::class);
         $expenses->method('getCurrency')->willReturn($this->createStub(Currency::class));
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('otherCurrencyExpected');
+        $this->expectExceptionMessageIs('otherCurrencyExpected');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
     public function testAccountMovementAndClearMovements(): void
     {
-        $this->repoLiquidation->expects($this->exactly(3))->method('persist');
+        $this->liquidationPersistence->expects($this->exactly(3))->method('persist');
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance', 'sameId'])->getMock();
         $transaction->expects($this->once())->method('sameId')->willReturn(true);
         $movement = $this->createMock(Movement::class);
         $movement->expects($this->once())->method('getAmount')->willReturn(self::$amount);
         $movement->expects($this->exactly(2))->method('getLiquidationExpenses')->willReturn($this->expenses);
-        $this->assertSame($transaction, $transaction->accountMovement($this->transactionPersistence->getRepositoryForLiquidation(), $movement));
+        $this->assertSame($transaction, $transaction->accountMovement($this->liquidationPersistence, $movement));
         $this->assertSame('0', $transaction->getAmountActionable()->getValue());
         $this->assertEquals(new TransactionExpenseVO('0.00', $this->currency), $transaction->getExpensesUnaccountedFor());
-        $acquisitionsCollection = $transaction->clearMovementCollection($this->transactionPersistence);
+        $acquisitionsCollection = $transaction->clearMovementCollection($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence);
         $this->assertInstanceOf(AcquisitionCollection::class, $acquisitionsCollection);
         $this->assertSame(self::$amount->getValue(), $transaction->getAmountActionable()->getValue());
         $this->assertEquals($this->expenses, $transaction->getExpensesUnaccountedFor());
@@ -227,23 +233,23 @@ class LiquidationTest extends TestCase
 
     public function testMovementWithWrongExpensesAmountThrowsException(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('persist');
+        $this->liquidationPersistence->expects($this->once())->method('persist');
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance', 'sameId'])->getMock();
         $transaction->expects($this->once())->method('sameId')->willReturn(true);
         $movement = $this->createMock(Movement::class);
         $movement->expects($this->once())->method('getLiquidationExpenses')->willReturn($this->expenses->add(new TransactionExpenseVO('1', $this->currency)));
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('InvalidMovementExpensesAmount');
-        $transaction->accountMovement($this->transactionPersistence->getRepositoryForLiquidation(), $movement);
+        $this->expectExceptionMessageIs('InvalidMovementExpensesAmount');
+        $transaction->accountMovement($this->liquidationPersistence, $movement);
     }
 
     public function testMovementAmountGreaterThanAmountRemainingThrowsException(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('persist');
+        $this->liquidationPersistence->expects($this->once())->method('persist');
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance', 'sameId'])->getMock();
         $transaction->expects($this->once())->method('sameId')->willReturn(true);
         $movement = $this->createMock(Movement::class);
@@ -252,90 +258,90 @@ class LiquidationTest extends TestCase
         );
         $movement->expects($this->once())->method('getLiquidationExpenses')->willReturn(new TransactionExpenseVO('4.56', $this->currency));
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('MovementAmountNotWithinAllowedLimits');
-        $transaction->accountMovement($this->transactionPersistence->getRepositoryForLiquidation(), $movement);
+        $this->expectExceptionMessageIs('MovementAmountNotWithinAllowedLimits');
+        $transaction->accountMovement($this->liquidationPersistence, $movement);
     }
 
     public function testCreateIsRolledBackOnTransactionException(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('beginTransaction');
-        $this->repoLiquidation->expects($this->once())->method('commit')->willThrowException(new \Exception('simulating uncached exception'));
-        $this->repoLiquidation->expects($this->once())->method('rollBack');
+        $this->liquidationPersistence->expects($this->once())->method('beginTransaction');
+        $this->liquidationPersistence->expects($this->once())->method('commit')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->liquidationPersistence->expects($this->once())->method('rollBack');
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
+        $this->expectExceptionMessageIs('simulating uncached exception');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
     public function testPersistRemove(): void
     {
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction->expects($this->once())->method('fiFoCriteriaInstance');
-        $this->repoLiquidation->expects($this->once())->method('beginTransaction');
-        $this->repoLiquidation->expects($this->once())->method('remove');
-        $this->repoLiquidation->expects($this->once())->method('flush');
-        $this->repoLiquidation->expects($this->once())->method('commit');
-        $transaction->persistRemove($this->transactionPersistence);
+        $this->liquidationPersistence->expects($this->once())->method('beginTransaction');
+        $this->liquidationPersistence->expects($this->once())->method('remove');
+        $this->liquidationPersistence->expects($this->once())->method('flush');
+        $this->liquidationPersistence->expects($this->once())->method('commit');
+        $transaction->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
     }
 
     public function testRemoveIsRolledBackOnTransactionException(): void
     {
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction->expects($this->once())->method('fiFoCriteriaInstance');
-        $this->repoLiquidation->expects($this->once())->method('beginTransaction');
-        $this->repoLiquidation->expects($this->once())->method('remove')->willThrowException(new \Exception('simulating uncached exception'));
-        $this->repoLiquidation->expects($this->once())->method('rollBack');
+        $this->liquidationPersistence->expects($this->once())->method('beginTransaction');
+        $this->liquidationPersistence->expects($this->once())->method('remove')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->liquidationPersistence->expects($this->once())->method('rollBack');
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
-        $transaction->persistRemove($this->transactionPersistence);
+        $this->expectExceptionMessageIs('simulating uncached exception');
+        $transaction->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
     }
 
     public function testExceptionIsThrownOnCreateCommitFail(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('commit')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->liquidationPersistence->expects($this->once())->method('commit')->willThrowException(new \Exception('simulating uncached exception'));
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
+        $this->expectExceptionMessageIs('simulating uncached exception');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
     public function testExceptionIsThrownOnRemoveCommitFail(): void
     {
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction->expects($this->once())->method('fiFoCriteriaInstance');
-        $this->repoLiquidation->expects($this->once())->method('remove')->willThrowException(new \Exception('simulating uncached exception'));
+        $this->liquidationPersistence->expects($this->once())->method('remove')->willThrowException(new \Exception('simulating uncached exception'));
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating uncached exception');
-        $transaction->persistRemove($this->transactionPersistence);
+        $this->expectExceptionMessageIs('simulating uncached exception');
+        $transaction->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
     }
 
     public function testDomainExceptionWhileInCreateTransactionThrowsDomainException(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('persist')->willThrowException(new \Exception('simulating exception is thrown'));
+        $this->liquidationPersistence->expects($this->once())->method('persist')->willThrowException(new \Exception('simulating exception is thrown'));
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating exception is thrown');
+        $this->expectExceptionMessageIs('simulating exception is thrown');
         $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
     public function testDomainExceptionWhileInRemoveTransactionThrowsDomainException(): void
     {
-        $this->repoLiquidation->expects($this->once())->method('persist');
+        $this->liquidationPersistence->expects($this->once())->method('persist');
         $transaction = $this->getMockBuilder(Liquidation::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->transactionPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
+            [$this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, self::$amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
         $transaction->expects($this->once())->method('fiFoCriteriaInstance')->willThrowException(new \Exception('simulating exception is thrown'));
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('simulating exception is thrown');
-        $transaction->persistRemove($this->transactionPersistence);
+        $this->expectExceptionMessageIs('simulating exception is thrown');
+        $transaction->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
     }
 }

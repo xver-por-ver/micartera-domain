@@ -7,13 +7,25 @@ use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Currency\Domain\CurrencyPersistenceInterface;
 use Xver\MiCartera\Domain\Currency\Domain\CurrencyRepositoryInterface;
+use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityPersistence;
+use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
-final class CurrencyPersistence implements CurrencyPersistenceInterface
+/**
+ * @template T of EntityInterface
+ * 
+ * @template-extends EntityPersistence<Currency>
+ */
+final class CurrencyPersistence extends EntityPersistence implements CurrencyPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {}
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Currency::class);
+    }
 
+    /**
+     * @return CurrencyRepositoryInterface
+     */
     #[\Override]
     public function getRepository(): EntityRepositoryInterface
     {

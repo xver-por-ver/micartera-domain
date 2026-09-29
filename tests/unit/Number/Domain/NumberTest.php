@@ -24,7 +24,7 @@ class NumberTest extends TestCase
     {
         if ($exception) {
             $this->expectException(DomainViolationException::class);
-            $this->expectExceptionMessage('numberFormat');
+            $this->expectExceptionMessageIs('numberFormat');
         } else {
             $this->expectNotToPerformAssertions();
         }
@@ -77,7 +77,7 @@ class NumberTest extends TestCase
     public function testAssertDecimalPlaces(string $value): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('numberPrecision');
+        $this->expectExceptionMessageIs('numberPrecision');
         new Number($value);
     }
 
@@ -93,7 +93,7 @@ class NumberTest extends TestCase
     public function testAssertValueWithinRange(string $value): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('enterNumberBetween');
+        $this->expectExceptionMessageIs('enterNumberBetween');
         new Number($value);
     }
 

@@ -9,6 +9,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -21,7 +22,9 @@ class Liquidation extends TransactionAbstract
     private Collection $movementCollection;
 
     public function __construct(
-        private readonly TransactionPersistenceInterface $transactionPersistence,
+        private readonly LiquidationPersistenceInterface $liquidationPersistence,
+        private readonly AcquisitionPersistenceInterface $acquisitionPersistence,
+        private readonly MovementPersistenceInterface $movementPersistence,
         Stock $stock,
         StockPriceVO $liquidationPrice,
         \DateTime $datetimeutc,
@@ -45,34 +48,33 @@ class Liquidation extends TransactionAbstract
     }
 
     public function clearMovementCollection(
-        TransactionPersistenceInterface $transactionPersistence
+        AcquisitionPersistenceInterface $acquisitionPersistence,
+        LiquidationPersistenceInterface $liquidationPersistence,
+        MovementPersistenceInterface $movementPersistence
     ): AcquisitionCollection {
         $updatedAcquisitionsCollection = new AcquisitionCollection([]);
-        $repoMovement = $transactionPersistence->getRepositoryForMovement();
-        $repoAcquisition = $transactionPersistence->getRepository();
-        $repoLiquidation = $transactionPersistence->getRepositoryForLiquidation();
         foreach ($this->movementCollection->toArray() as $movement) {
             $acquisition = $movement->getAcquisition();
             $acquisition->unaccountMovement(
-                $repoAcquisition,
+                $acquisitionPersistence,
                 $movement
             );
             if (false === $updatedAcquisitionsCollection->contains($acquisition)) {
                 $updatedAcquisitionsCollection->add($acquisition);
             }
-            $repoMovement->remove($movement);
-            $repoMovement->flush();
+            $movementPersistence->remove($movement);
+            $movementPersistence->flush();
             parent::increaseExpensesUnaccountedFor($movement->getLiquidationExpenses());
         }
         $this->movementCollection->clear();
         $this->amountActionable = new TransactionAmountActionableVO($this->amount->getValue());
-        $repoLiquidation->persist($this);
+        $liquidationPersistence->persist($this);
 
         return $updatedAcquisitionsCollection;
     }
 
     public function accountMovement(
-        LiquidationRepositoryInterface $repoLiquidation,
+        LiquidationPersistenceInterface $liquidationPersistence,
         Movement $movement
     ): self {
         if (false === $this->sameId($movement->getLiquidation())) {
@@ -81,7 +83,7 @@ class Liquidation extends TransactionAbstract
         parent::decreaseExpensesUnaccountedFor($movement->getLiquidationExpenses()); // TODO: parent::? should be $this->
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->movementCollection->add($movement);
-        $repoLiquidation->persist($this);
+        $liquidationPersistence->persist($this);
 
         return $this;
     }
@@ -89,7 +91,7 @@ class Liquidation extends TransactionAbstract
     #[\Override]
     protected function persistCreate(): void
     {
-        $repoLiquidation = $this->transactionPersistence->getRepositoryForLiquidation();
+        $repoLiquidation = $this->liquidationPersistence->getRepository();
         if (
             false === $repoLiquidation->assertNoTransWithSameAccountStockOnDateTime(
                 $this->getAccount(),
@@ -106,37 +108,43 @@ class Liquidation extends TransactionAbstract
                 'liquidation.duplicate'
             );
         }
-        $repoLiquidation->beginTransaction();
+        $this->liquidationPersistence->beginTransaction();
 
         try {
             $this->fiFoCriteriaInstance(
-                $this->transactionPersistence
+                $this->acquisitionPersistence,
+                $this->liquidationPersistence,
+                $this->movementPersistence
             )->onLiquidation($this);
-            $repoLiquidation->persist($this);
-            $repoLiquidation->flush();
-            $repoLiquidation->commit();
+            $this->liquidationPersistence->persist($this);
+            $this->liquidationPersistence->flush();
+            $this->liquidationPersistence->commit();
         } catch (\Throwable $th) {
-            $repoLiquidation->rollBack();
+            $this->liquidationPersistence->rollBack();
 
             throw $th;
         }
     }
 
     public function persistRemove(
-        TransactionPersistenceInterface $transactionPersistence
+        LiquidationPersistenceInterface $liquidationPersistence,
+        AcquisitionPersistenceInterface $acquisitionPersistence,
+        MovementPersistenceInterface $movementPersistence
     ): void {
-        $repoLiquidation = $transactionPersistence->getRepositoryForLiquidation();
-        $repoLiquidation->beginTransaction();
+        $repoLiquidation = $liquidationPersistence->getRepository();
+        $liquidationPersistence->beginTransaction();
 
         try {
             $this->fiFoCriteriaInstance(
-                $transactionPersistence
+                $acquisitionPersistence,
+                $liquidationPersistence,
+                $movementPersistence
             )->onLiquidationRemoval($this);
-            $repoLiquidation->remove($this);
-            $repoLiquidation->flush();
-            $repoLiquidation->commit();
+            $liquidationPersistence->remove($this);
+            $liquidationPersistence->flush();
+            $liquidationPersistence->commit();
         } catch (\Throwable $th) {
-            $repoLiquidation->rollBack();
+            $liquidationPersistence->rollBack();
 
             throw $th;
         }

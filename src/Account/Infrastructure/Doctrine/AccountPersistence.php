@@ -9,12 +9,21 @@ use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Account\Domain\AccountRepositoryInterface;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Currency\Domain\CurrencyRepositoryInterface;
+use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityPersistence;
+use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
-final class AccountPersistence implements AccountPersistenceInterface
+/**
+ * @template T of EntityInterface
+ * 
+ * @template-extends EntityPersistence<Account>
+ */
+final class AccountPersistence extends EntityPersistence implements AccountPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {}
+    public function __construct(private ManagerRegistry $managerRegistry) {
+        parent::__construct($this->managerRegistry, Account::class);
+    }
 
     #[\Override]
     public function getRepository(): EntityRepositoryInterface

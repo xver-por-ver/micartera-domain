@@ -7,11 +7,12 @@ use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -28,7 +29,9 @@ class Movement implements EntityInterface
     private TransactionExpenseVO $liquidationExpenses;
 
     public function __construct(
-        TransactionPersistenceInterface $transactionPersistence,
+        MovementPersistenceInterface $movementPersistence,
+        AcquisitionPersistenceInterface $acquisitionPersistence,
+        LiquidationPersistenceInterface $liquidationPersistence,
         private readonly Acquisition $acquisition,
         private readonly Liquidation $liquidation
     ) {
@@ -41,10 +44,9 @@ class Movement implements EntityInterface
         $this->setLiquidationPrice();
         $this->setAcquisitionExpenses();
         $this->setLiquidationExpenses();
-        $this->acquisition->accountMovement($transactionPersistence->getRepository(), $this);
-        $this->liquidation->accountMovement($transactionPersistence->getRepositoryForLiquidation(), $this);
-        $repoMovement = $transactionPersistence->getRepositoryForMovement();
-        $repoMovement->persist($this);
+        $this->acquisition->accountMovement($acquisitionPersistence, $this);
+        $this->liquidation->accountMovement($liquidationPersistence, $this);
+        $movementPersistence->persist($this);
     }
 
     #[\Override]

@@ -38,7 +38,9 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 
 /**
@@ -65,7 +67,9 @@ use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 #[UsesClass(Acquisition::class)]
 #[UsesClass(AcquisitionCollection::class)]
 #[UsesClass(FiFoCriteria::class)]
-#[UsesClass(TransactionPersistence::class)]
+#[UsesClass(AcquisitionPersistence::class)]
+#[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementPersistence::class)]
 #[UsesClass(TransactionAbstract::class)]
 #[UsesClass(TransactionAmountActionableVO::class)]
 #[UsesClass(TransactionAmountVO::class)]
@@ -90,7 +94,7 @@ class ExchangeRepositoryDoctrineTest extends IntegrationTestCase
     {
         parent::$loadFixtures = true;
         $exchange = new Exchange($this->exchangePersistence, 'CODE', 'NAME');
-        $this->exchangePersistence->getRepository()->persist($exchange);
+        $this->exchangePersistence->persist($exchange);
         parent::detachEntity($exchange);
         $this->assertInstanceOf(Exchange::class, $this->exchangePersistence->getRepository()->findById($exchange->getCode()));
     }
@@ -111,9 +115,9 @@ class ExchangeRepositoryDoctrineTest extends IntegrationTestCase
 
     public function testExchangeIsFoundByIdOrThrowsExceptionWhenNotFoundWillThrowException(): void
     {
+        $entity = 'Exchange';
+        $id = 'XXX';
         try {
-            $entity = 'Exchange';
-            $id = 'XXX';
             $this->exchangePersistence->getRepository()->findByIdOrThrowException($id);
         } catch (EntityNotFoundException $th) {
             $this->assertSame('entityNotFound', $th->getTranslatableMessage()->getMessage());

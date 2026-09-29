@@ -17,25 +17,27 @@ use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
 use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockCreatePurchaseCommand;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockCreateSellCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\AcquisitionCreateCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationCreateCommand;
 use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockOperationImportCommand;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\StockRepositoryInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Criteria\FiFoCriteria;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAbstract;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -43,8 +45,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  * @internal
  */
 #[CoversClass(StockOperationImportCommand::class)]
-#[UsesClass(StockCreatePurchaseCommand::class)]
-#[UsesClass(StockCreateSellCommand::class)]
+#[UsesClass(AcquisitionCreateCommand::class)]
+#[UsesClass(LiquidationCreateCommand::class)]
 #[UsesClass(Acquisition::class)]
 #[UsesClass(AcquisitionCollection::class)]
 #[UsesClass(FiFoCriteria::class)]
@@ -67,7 +69,9 @@ class StockOperationImportCommandTest extends TestCase
     private MovementRepositoryInterface&Stub $repoMovement;
     private AcquisitionRepositoryInterface&Stub $repoAcquisition;
     private LiquidationRepositoryInterface&Stub $repoLiquidation;
-    private TransactionPersistenceInterface&Stub $transactionPersistence;
+    private AcquisitionPersistenceInterface&Stub $acquisitionPersistence;
+    private LiquidationPersistenceInterface&Stub $liquidationPersistence;
+    private MovementPersistenceInterface&Stub $movementPersistence;
     private AccountPersistenceInterface&Stub $accountPersistence;
     private StockPersistenceInterface&Stub $stockPersistence;
 
@@ -78,10 +82,12 @@ class StockOperationImportCommandTest extends TestCase
         $this->repoMovement = $this->createStub(MovementRepositoryInterface::class);
         $this->repoAcquisition = $this->createStub(AcquisitionRepositoryInterface::class);
         $this->repoLiquidation = $this->createStub(LiquidationRepositoryInterface::class);
-        $this->transactionPersistence = $this->createStub(TransactionPersistenceInterface::class);
-        $this->transactionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
-        $this->transactionPersistence->method('getRepositoryForMovement')->willReturn($this->repoMovement);
-        $this->transactionPersistence->method('getRepositoryForLiquidation')->willReturn($this->repoLiquidation);
+        $this->acquisitionPersistence = $this->createStub(AcquisitionPersistenceInterface::class);
+        $this->acquisitionPersistence->method('getRepository')->willReturn($this->repoAcquisition);
+        $this->liquidationPersistence = $this->createStub(LiquidationPersistenceInterface::class);
+        $this->liquidationPersistence->method('getRepository')->willReturn($this->repoLiquidation);
+        $this->movementPersistence = $this->createStub(MovementPersistenceInterface::class);
+        $this->movementPersistence->method('getRepository')->willReturn($this->repoMovement);
         $this->accountPersistence = $this->createStub(AccountPersistenceInterface::class);
         $this->accountPersistence->method('getRepository')->willReturn($this->repoAccount);
         $this->stockPersistence = $this->createStub(StockPersistenceInterface::class);
@@ -101,7 +107,7 @@ class StockOperationImportCommandTest extends TestCase
     {
         $this->repoAcquisition->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(true);
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($this->account);
-        $command = new StockOperationImportCommand($this->transactionPersistence, $this->accountPersistence, $this->stockPersistence);
+        $command = new StockOperationImportCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
 
         try {
             $command->invoke(1, $line, 'test@example.com');
@@ -142,7 +148,7 @@ class StockOperationImportCommandTest extends TestCase
         $this->repoStock->method('findByIdOrThrowException')->willThrowException(new EntityNotFoundException($entity, $identifier));
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($this->account);
         $date = new \DateTime('yesterday', new \DateTimeZone('UTC'));
-        $command = new StockOperationImportCommand($this->transactionPersistence, $this->accountPersistence, $this->stockPersistence);
+        $command = new StockOperationImportCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
 
         try {
             $command->invoke(

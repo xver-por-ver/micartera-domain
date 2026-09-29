@@ -6,6 +6,9 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterfac
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
 
+/**
+ * @template-extends EntityPersistenceInterface<Stock>
+ */
 interface StockPersistenceInterface extends EntityPersistenceInterface
 {
     /**

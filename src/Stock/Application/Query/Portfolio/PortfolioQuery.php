@@ -5,14 +5,14 @@ namespace Xver\MiCartera\Domain\Stock\Application\Query\Portfolio;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Portfolio\SummaryVO;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 
 final class PortfolioQuery
 {
     public function __construct(
         private StockPersistenceInterface $stockPersistence,
         private AccountPersistenceInterface $accountPersistence,
-        private TransactionPersistenceInterface $transactionPersistence
+        private AcquisitionPersistenceInterface $acquisitionPersistence
     ) {}
 
     public function getPortfolio(
@@ -24,14 +24,14 @@ final class PortfolioQuery
 
         return new PortfolioDTO(
             $account,
-            $this->transactionPersistence->getRepository()->findByAccountWithActionableAmount(
+            $this->acquisitionPersistence->getRepository()->findByAccountWithActionableAmount(
                 $account,
                 'ASC',
                 'datetimeutc',
                 $limit ? $limit + 1 : 0,
                 $limit ? $page * $limit : 0,
             ),
-            $this->transactionPersistence->getRepository()->portfolioSummary($account),
+            $this->acquisitionPersistence->getRepository()->portfolioSummary($account),
             $limit,
             $page
         );
@@ -44,6 +44,6 @@ final class PortfolioQuery
         $account = $this->accountPersistence->getRepository()->findByIdentifierOrThrowException($accountIdentifier);
         $stock = $this->stockPersistence->getRepository()->findById($stockCode);
 
-        return $this->transactionPersistence->getRepository()->portfolioSummary($account, $stock);
+        return $this->acquisitionPersistence->getRepository()->portfolioSummary($account, $stock);
     }
 }

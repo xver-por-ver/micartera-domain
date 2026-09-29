@@ -1,17 +1,17 @@
 <?php
 
-namespace Xver\MiCartera\Domain\Exchange\Domain;
+namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
 
 /**
- * @template-extends EntityPersistenceInterface<Exchange>
+ * @template-extends EntityPersistenceInterface<Liquidation>
  */
-interface ExchangePersistenceInterface extends EntityPersistenceInterface
+interface LiquidationPersistenceInterface extends EntityPersistenceInterface
 {
     /**
-     * @return ExchangeRepositoryInterface
+     * @return LiquidationRepositoryInterface
      */
     #[\Override]
     public function getRepository(): EntityRepositoryInterface;

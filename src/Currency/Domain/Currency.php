@@ -111,7 +111,7 @@ class Currency implements EntityInterface
                 'currency.code'
             );
         }
-        $repoCurrency->persist($this);
-        $repoCurrency->flush();
+        $this->currencyPersistance->persist($this);
+        $this->currencyPersistance->flush();
     }
 }

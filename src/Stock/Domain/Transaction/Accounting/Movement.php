@@ -41,10 +41,10 @@ class Movement implements EntityInterface
         $this->setLiquidationPrice();
         $this->setAcquisitionExpenses();
         $this->setLiquidationExpenses();
-        $this->acquisition->accountMovement($transactionPersistence->getRepository(), $this);
-        $this->liquidation->accountMovement($transactionPersistence->getRepositoryForLiquidation(), $this);
+        $this->acquisition->accountMovement($this);
+        $this->liquidation->accountMovement($this);
         $repoMovement = $transactionPersistence->getRepositoryForMovement();
-        $repoMovement->persist($this);
+        $transactionPersistence->persist($this);
     }
 
     #[\Override]

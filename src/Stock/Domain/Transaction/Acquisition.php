@@ -41,7 +41,6 @@ class Acquisition extends TransactionAbstract
     }
 
     public function accountMovement(
-        AcquisitionRepositoryInterface $repoAcquisition,
         Movement $movement
     ): self {
         if (false === $this->sameId($movement->getAcquisition())) {
@@ -49,13 +48,12 @@ class Acquisition extends TransactionAbstract
         }
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->decreaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
-        $repoAcquisition->persist($this);
+        $this->transactionPersistence->persist($this);
 
         return $this;
     }
 
     public function unaccountMovement(
-        AcquisitionRepositoryInterface $repoAcquisition,
         Movement $movement
     ): self {
         if (false === $this->sameId($movement->getAcquisition())) {
@@ -63,7 +61,7 @@ class Acquisition extends TransactionAbstract
         }
         $this->increaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->increaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
-        $repoAcquisition->persist($this);
+        $this->transactionPersistence->persist($this);
 
         return $this;
     }
@@ -88,17 +86,17 @@ class Acquisition extends TransactionAbstract
                 'acquisition.duplicate'
             );
         }
-        $repoAcquisition->beginTransaction();
+        $this->transactionPersistence->beginTransaction();
 
         try {
             $this->fiFoCriteriaInstance(
                 $this->transactionPersistence
             )->onAcquisition($this);
-            $repoAcquisition->persist($this);
-            $repoAcquisition->flush();
-            $repoAcquisition->commit();
+            $this->transactionPersistence->persist($this);
+            $this->transactionPersistence->flush();
+            $this->transactionPersistence->commit();
         } catch (\Throwable $th) {
-            $repoAcquisition->rollBack();
+            $this->transactionPersistence->rollBack();
 
             throw $th;
         }
@@ -118,7 +116,7 @@ class Acquisition extends TransactionAbstract
             );
         }
         $repoAcquisition = $transactionPersistence->getRepository();
-        $repoAcquisition->remove($this);
-        $repoAcquisition->flush();
+        $transactionPersistence->remove($this);
+        $transactionPersistence->flush();
     }
 }

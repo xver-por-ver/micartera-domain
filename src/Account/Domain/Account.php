@@ -57,7 +57,7 @@ class Account extends BaseAccount
         }
         $repoAccount = $this->accountPersistence->getRepository();
         $this->validateIdentifierUniqueness($repoAccount);
-        $repoAccount->persist($this);
-        $repoAccount->flush();
+        $this->accountPersistence->persist($this);
+        $this->accountPersistence->flush();
     }
 }

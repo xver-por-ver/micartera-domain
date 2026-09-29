@@ -2,10 +2,14 @@
 
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementRepositoryInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
 
+/**
+ * @template-extends EntityPersistenceInterface<Acquisition|Liquidation|Movement>
+ */
 interface TransactionPersistenceInterface extends EntityPersistenceInterface
 {
     /**

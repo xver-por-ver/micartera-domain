@@ -54,34 +54,30 @@ class Liquidation extends TransactionAbstract
         foreach ($this->movementCollection->toArray() as $movement) {
             $acquisition = $movement->getAcquisition();
             $acquisition->unaccountMovement(
-                $repoAcquisition,
                 $movement
             );
             if (false === $updatedAcquisitionsCollection->contains($acquisition)) {
                 $updatedAcquisitionsCollection->add($acquisition);
             }
-            $repoMovement->remove($movement);
-            $repoMovement->flush();
+            $this->transactionPersistence->remove($movement);
+            $this->transactionPersistence->flush();
             parent::increaseExpensesUnaccountedFor($movement->getLiquidationExpenses());
         }
         $this->movementCollection->clear();
         $this->amountActionable = new TransactionAmountActionableVO($this->amount->getValue());
-        $repoLiquidation->persist($this);
+        $this->transactionPersistence->persist($this);
 
         return $updatedAcquisitionsCollection;
     }
 
-    public function accountMovement(
-        LiquidationRepositoryInterface $repoLiquidation,
-        Movement $movement
-    ): self {
+    public function accountMovement(Movement $movement): self {
         if (false === $this->sameId($movement->getLiquidation())) {
             throw new \InvalidArgumentException();
         }
         parent::decreaseExpensesUnaccountedFor($movement->getLiquidationExpenses()); // TODO: parent::? should be $this->
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->movementCollection->add($movement);
-        $repoLiquidation->persist($this);
+        $this->transactionPersistence->persist($this);
 
         return $this;
     }
@@ -106,17 +102,17 @@ class Liquidation extends TransactionAbstract
                 'liquidation.duplicate'
             );
         }
-        $repoLiquidation->beginTransaction();
+        $this->transactionPersistence->beginTransaction();
 
         try {
             $this->fiFoCriteriaInstance(
                 $this->transactionPersistence
             )->onLiquidation($this);
-            $repoLiquidation->persist($this);
-            $repoLiquidation->flush();
-            $repoLiquidation->commit();
+            $this->transactionPersistence->persist($this);
+            $this->transactionPersistence->flush();
+            $this->transactionPersistence->commit();
         } catch (\Throwable $th) {
-            $repoLiquidation->rollBack();
+            $this->transactionPersistence->rollBack();
 
             throw $th;
         }
@@ -126,17 +122,17 @@ class Liquidation extends TransactionAbstract
         TransactionPersistenceInterface $transactionPersistence
     ): void {
         $repoLiquidation = $transactionPersistence->getRepositoryForLiquidation();
-        $repoLiquidation->beginTransaction();
+        $transactionPersistence->beginTransaction();
 
         try {
             $this->fiFoCriteriaInstance(
                 $transactionPersistence
             )->onLiquidationRemoval($this);
-            $repoLiquidation->remove($this);
-            $repoLiquidation->flush();
-            $repoLiquidation->commit();
+            $transactionPersistence->remove($this);
+            $transactionPersistence->flush();
+            $transactionPersistence->commit();
         } catch (\Throwable $th) {
-            $repoLiquidation->rollBack();
+            $transactionPersistence->rollBack();
 
             throw $th;
         }

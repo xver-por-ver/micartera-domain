@@ -4,15 +4,22 @@ namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Translation\TranslatableMessage;
+use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityPersistence;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterface;
+use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
-final class StockPersistence implements StockPersistenceInterface
+/**
+ * @template T of EntityInterface
+ * 
+ * @template-extends EntityPersistence<Stock>
+ */
+final class StockPersistence extends EntityPersistence implements StockPersistenceInterface
 {
     public function __construct(private ManagerRegistry $managerRegistry) {}
 

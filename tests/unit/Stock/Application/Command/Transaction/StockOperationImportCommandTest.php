@@ -17,8 +17,8 @@ use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
 use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockCreatePurchaseCommand;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockCreateSellCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\AcquisitionCreateCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationCreateCommand;
 use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockOperationImportCommand;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
@@ -45,8 +45,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  * @internal
  */
 #[CoversClass(StockOperationImportCommand::class)]
-#[UsesClass(StockCreatePurchaseCommand::class)]
-#[UsesClass(StockCreateSellCommand::class)]
+#[UsesClass(AcquisitionCreateCommand::class)]
+#[UsesClass(LiquidationCreateCommand::class)]
 #[UsesClass(Acquisition::class)]
 #[UsesClass(AcquisitionCollection::class)]
 #[UsesClass(FiFoCriteria::class)]

@@ -5,7 +5,7 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 use Symfony\Component\Uid\Uuid;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 
-final class StockDeletePurchaseCommand
+final class AcquisitionDeleteCommand
 {
     public function __construct(private AcquisitionPersistenceInterface $acquisitionPersistence) {}
 

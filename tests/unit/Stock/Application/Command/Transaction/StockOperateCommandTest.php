@@ -16,10 +16,10 @@ use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
 use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockCreatePurchaseCommand;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockCreateSellCommand;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockDeletePurchaseCommand;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\StockDeleteSellCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\AcquisitionCreateCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationCreateCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\AcquisitionDeleteCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationDeleteCommand;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
@@ -41,10 +41,10 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
 /**
  * @internal
  */
-#[CoversClass(StockCreatePurchaseCommand::class)]
-#[CoversClass(StockCreateSellCommand::class)]
-#[CoversClass(StockDeletePurchaseCommand::class)]
-#[CoversClass(StockDeleteSellCommand::class)]
+#[CoversClass(AcquisitionCreateCommand::class)]
+#[CoversClass(LiquidationCreateCommand::class)]
+#[CoversClass(AcquisitionDeleteCommand::class)]
+#[CoversClass(LiquidationDeleteCommand::class)]
 #[UsesClass(MoneyVO::class)]
 #[UsesClass(Number::class)]
 #[UsesClass(NumberOperation::class)]
@@ -106,7 +106,7 @@ class StockOperateCommandTest extends TestCase
         $this->repoAcquisition->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(true);
         $this->repoStock->method('findByIdOrThrowException')->willReturn($this->stock);
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($this->account);
-        $command = new StockCreatePurchaseCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
+        $command = new AcquisitionCreateCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
         $command->invoke(
             'TEST',
             new \DateTime('now', new \DateTimeZone('UTC')),
@@ -123,7 +123,7 @@ class StockOperateCommandTest extends TestCase
         $uuid = Uuid::v4();
         $transaction = $this->createStub(Acquisition::class);
         $this->repoAcquisition->method('findByIdOrThrowException')->willReturn($transaction);
-        $command = new StockDeletePurchaseCommand($this->acquisitionPersistence);
+        $command = new AcquisitionDeleteCommand($this->acquisitionPersistence);
         $command->invoke($uuid->toRfc4122());
     }
 
@@ -132,7 +132,7 @@ class StockOperateCommandTest extends TestCase
         $this->repoLiquidation->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(true);
         $this->repoStock->method('findByIdOrThrowException')->willReturn($this->stock);
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($this->account);
-        $command = $this->createStub(StockCreateSellCommand::class);        
+        $command = $this->createStub(LiquidationCreateCommand::class);        
         $liquidation = $command->invoke(
             'TEST',
             new \DateTime('now', new \DateTimeZone('UTC')),
@@ -150,7 +150,7 @@ class StockOperateCommandTest extends TestCase
         $uuid = Uuid::v4();
         $transaction = $this->createStub(Liquidation::class);
         $this->repoLiquidation->method('findByIdOrThrowException')->willReturn($transaction);
-        $command = new StockDeleteSellCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
+        $command = new LiquidationDeleteCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $command->invoke($uuid->toRfc4122());
     }
 }

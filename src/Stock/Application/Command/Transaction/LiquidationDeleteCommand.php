@@ -7,7 +7,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenc
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 
-final class StockDeleteSellCommand
+final class LiquidationDeleteCommand
 {
     public function __construct(
         private LiquidationPersistenceInterface $liquidationPersistence,

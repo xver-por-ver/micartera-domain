@@ -44,8 +44,8 @@ class StockOperationImportCommand
             }
             $command
                 = 'acquisition' === $type
-                ? new StockCreatePurchaseCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence)
-                : new StockCreateSellCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
+                ? new AcquisitionCreateCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence)
+                : new LiquidationCreateCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
             $command->invoke(
                 $line[2],
                 $dateTime,

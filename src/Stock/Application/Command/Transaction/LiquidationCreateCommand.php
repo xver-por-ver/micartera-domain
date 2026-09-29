@@ -6,8 +6,8 @@ use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
@@ -15,11 +15,11 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
 /**
  * @psalm-api
  */
-class StockCreatePurchaseCommand
+class LiquidationCreateCommand
 {
     public function __construct(
-        private AcquisitionPersistenceInterface $acquisitionPersistence,
         private LiquidationPersistenceInterface $liquidationPersistence,
+        private AcquisitionPersistenceInterface $acquisitionPersistence,
         private MovementPersistenceInterface $movementPersistence,
         private AccountPersistenceInterface $accountPersistence,
         private StockPersistenceInterface $stockPersistence
@@ -37,13 +37,13 @@ class StockCreatePurchaseCommand
         string $priceValue,
         string $expensesValue,
         string $accountIdentifier
-    ): Acquisition {
+    ): Liquidation {
         $account = $this->accountPersistence->getRepository()->findByIdentifierOrThrowException($accountIdentifier);
         $stock = $this->stockPersistence->getRepository()->findByIdOrThrowException($stockCode);
 
-        return new Acquisition(
-            $this->acquisitionPersistence,
+        return new Liquidation(
             $this->liquidationPersistence,
+            $this->acquisitionPersistence,
             $this->movementPersistence,
             $stock,
             new StockPriceVO(

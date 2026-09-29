@@ -18,7 +18,9 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockPersistence;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\TransactionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 
 class BaseDataFixtures extends Fixture
 {
@@ -55,11 +57,15 @@ class BaseDataFixtures extends Fixture
         new Stock($stockPersistence, 'SAN', 'Santander', $price2, $exchange);
         $price3 = new StockPriceVO('5.9620', $currencyEuro);
         new Stock($stockPersistence, 'ROVI', 'Laboratorios Rovi', $price3, $exchange);
-        $transactionPersistence = new TransactionPersistence($this->registry);
+        $acquisitionPersistence = new AcquisitionPersistence($this->registry);
+        $liquidationPersistence = new LiquidationPersistence($this->registry);
+        $movementPersistence = new MovementPersistence($this->registry);
         $dateAcquisition = new \DateTime('first day of january', new \DateTimeZone('UTC'));
         $dateLiquidation = (clone $dateAcquisition)->add(new \DateInterval('PT1S'));
         new Acquisition(
-            $transactionPersistence,
+            $acquisitionPersistence,
+            $liquidationPersistence,
+            $movementPersistence,
             $stock,
             $price,
             $dateAcquisition,
@@ -68,7 +74,9 @@ class BaseDataFixtures extends Fixture
             $account
         );
         new Liquidation(
-            $transactionPersistence,
+            $liquidationPersistence,
+            $acquisitionPersistence,
+            $movementPersistence,
             $stock,
             $price,
             $dateLiquidation,

@@ -11,7 +11,6 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -28,7 +27,7 @@ class Movement implements EntityInterface
     private TransactionExpenseVO $liquidationExpenses;
 
     public function __construct(
-        TransactionPersistenceInterface $transactionPersistence,
+        MovementPersistenceInterface $movementPersistence,
         private readonly Acquisition $acquisition,
         private readonly Liquidation $liquidation
     ) {
@@ -43,8 +42,8 @@ class Movement implements EntityInterface
         $this->setLiquidationExpenses();
         $this->acquisition->accountMovement($this);
         $this->liquidation->accountMovement($this);
-        $repoMovement = $transactionPersistence->getRepositoryForMovement();
-        $transactionPersistence->persist($this);
+        $repoMovement = $movementPersistence->getRepository();
+        $movementPersistence->persist($this);
     }
 
     #[\Override]

@@ -6,12 +6,14 @@ use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
 /**
@@ -22,7 +24,9 @@ class FiFoCriteria
     private AcquisitionCollection $acquisitionsCollection;
 
     public function __construct(
-        private readonly TransactionPersistenceInterface $transactionPersistence
+        private readonly AcquisitionPersistenceInterface $acquisitionPersistence,
+        private readonly LiquidationPersistenceInterface $liquidationPersistence,
+        private readonly MovementPersistenceInterface $movementPersistence
     ) {
         $this->acquisitionsCollection = new AcquisitionCollection([]);
     }
@@ -34,7 +38,7 @@ class FiFoCriteria
 
         $this->acquisitionsCollection->add($acquisition);
 
-        $liquidationsCollection = $this->transactionPersistence->getRepositoryForLiquidation()->findByAccountStockAndDateAtOrAfter(
+        $liquidationsCollection = $this->liquidationPersistence->getRepository()->findByAccountStockAndDateAtOrAfter(
             $acquisition->getAccount(),
             $acquisition->getStock(),
             $acquisition->getDateTimeUtc()
@@ -52,7 +56,7 @@ class FiFoCriteria
     ): void {
         $this->acquisitionsCollection = new AcquisitionCollection([]);
 
-        $liquidationsCollection = $this->transactionPersistence->getRepositoryForLiquidation()->findByAccountStockAndDateAtOrAfter(
+        $liquidationsCollection = $this->liquidationPersistence->getRepository()->findByAccountStockAndDateAtOrAfter(
             $liquidation->getAccount(),
             $liquidation->getStock(),
             $liquidation->getDateTimeUtc()
@@ -81,7 +85,7 @@ class FiFoCriteria
     ): void {
         $this->acquisitionsCollection = new AcquisitionCollection([]);
 
-        $liquidationsCollection = $this->transactionPersistence->getRepositoryForLiquidation()->findByAccountStockAndDateAtOrAfter(
+        $liquidationsCollection = $this->liquidationPersistence->getRepository()->findByAccountStockAndDateAtOrAfter(
             $liquidation->getAccount(),
             $liquidation->getStock(),
             $liquidation->getDateTimeUtc()
@@ -102,7 +106,8 @@ class FiFoCriteria
         foreach ($liquidationsCollection->toArray() as $liquidation) {
             $this->mergeAcquisitions(
                 $liquidation->clearMovementCollection(
-                    $this->transactionPersistence
+                    $this->acquisitionPersistence,
+                    $this->movementPersistence
                 )
             );
         }
@@ -113,7 +118,7 @@ class FiFoCriteria
         Stock $stock,
         \DateTime $dateLastLiquidation
     ): void {
-        $acquisitionsWithAmountOutstandingCollection = $this->transactionPersistence->getRepository()->findByAccountStockWithActionableAmountAndDateAtOrBefore(
+        $acquisitionsWithAmountOutstandingCollection = $this->acquisitionPersistence->getRepository()->findByAccountStockWithActionableAmountAndDateAtOrBefore(
             $account,
             $stock,
             $dateLastLiquidation
@@ -149,7 +154,7 @@ class FiFoCriteria
         foreach ($this->acquisitionsCollection->toArray() as $acquisition) {
             if ($acquisition->getAmountActionable()->greater(new TransactionAmountActionableVO('0'))) {
                 try {
-                    new Movement($this->transactionPersistence, $acquisition, $liquidation);
+                    new Movement($this->movementPersistence, $acquisition, $liquidation);
                 } catch (DomainViolationException $dv) {
                     throw new DomainViolationException(
                         new TranslatableMessage(

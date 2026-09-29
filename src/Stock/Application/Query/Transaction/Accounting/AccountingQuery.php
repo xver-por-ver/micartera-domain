@@ -3,13 +3,13 @@
 namespace Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 
 final class AccountingQuery
 {
     public function __construct(
         private AccountPersistenceInterface $accountPersistence,
-        private TransactionPersistenceInterface $transactionPersistence
+        private MovementPersistenceInterface $movementPersistence
     ) {}
 
     public function byAccountYear(
@@ -27,14 +27,14 @@ final class AccountingQuery
 
         return new AccountingDTO(
             $account,
-            $this->transactionPersistence->getRepositoryForMovement()->findByAccountAndYear(
+            $this->movementPersistence->getRepository()->findByAccountAndYear(
                 $account,
                 $displayedYear,
                 $limit ? $limit + 1 : null,
                 $limit ? $page * $limit : 0
             ),
             $displayedYear,
-            $this->transactionPersistence->getRepositoryForMovement()->accountingSummaryByAccount($account, $displayedYear),
+            $this->movementPersistence->getRepository()->accountingSummaryByAccount($account, $displayedYear),
             $limit,
             $page
         );

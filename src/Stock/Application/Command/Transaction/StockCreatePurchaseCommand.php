@@ -5,10 +5,12 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
 
 /**
  * @psalm-api
@@ -16,7 +18,9 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterfa
 class StockCreatePurchaseCommand
 {
     public function __construct(
-        private TransactionPersistenceInterface $transactionPersistence,
+        private AcquisitionPersistenceInterface $acquisitionPersistence,
+        private LiquidationPersistenceInterface $liquidationPersistence,
+        private MovementPersistenceInterface $movementPersistence,
         private AccountPersistenceInterface $accountPersistence,
         private StockPersistenceInterface $stockPersistence
     ) {}
@@ -38,7 +42,9 @@ class StockCreatePurchaseCommand
         $stock = $this->stockPersistence->getRepository()->findByIdOrThrowException($stockCode);
 
         return new Acquisition(
-            $this->transactionPersistence,
+            $this->acquisitionPersistence,
+            $this->liquidationPersistence,
+            $this->movementPersistence,
             $stock,
             new StockPriceVO(
                 $priceValue,

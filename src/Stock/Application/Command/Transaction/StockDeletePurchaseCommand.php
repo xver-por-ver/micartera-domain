@@ -3,19 +3,19 @@
 namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 
 use Symfony\Component\Uid\Uuid;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 
 final class StockDeletePurchaseCommand
 {
-    public function __construct(private TransactionPersistenceInterface $transactionPersistence) {}
+    public function __construct(private AcquisitionPersistenceInterface $acquisitionPersistence) {}
 
     public function invoke(
         string $acquisitionUuid
     ): void {
-        $this->transactionPersistence->getRepository()->findByIdOrThrowException(
+        $this->acquisitionPersistence->getRepository()->findByIdOrThrowException(
             new Uuid($acquisitionUuid)
         )->persistRemove(
-            $this->transactionPersistence
+            $this->acquisitionPersistence
         );
     }
 }

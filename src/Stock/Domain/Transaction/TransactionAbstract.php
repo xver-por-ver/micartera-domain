@@ -248,8 +248,10 @@ abstract class TransactionAbstract implements EntityInterface
     abstract protected function persistCreate(): void;
 
     protected function fiFoCriteriaInstance(
-        TransactionPersistenceInterface $transactionPersistence
+        AcquisitionPersistenceInterface $acquisitionPersistence,
+        LiquidationPersistenceInterface $liquidationPersistence,
+        Accounting\MovementPersistenceInterface $movementPersistence
     ): FiFoCriteria {
-        return new FiFoCriteria($transactionPersistence);
+        return new FiFoCriteria($acquisitionPersistence, $liquidationPersistence, $movementPersistence);
     }
 }

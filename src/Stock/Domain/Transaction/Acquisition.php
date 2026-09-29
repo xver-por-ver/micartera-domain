@@ -7,6 +7,7 @@ use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -16,7 +17,9 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 class Acquisition extends TransactionAbstract
 {
     public function __construct(
-        private readonly TransactionPersistenceInterface $transactionPersistence,
+        private readonly AcquisitionPersistenceInterface $acquisitionPersistence,
+        private readonly LiquidationPersistenceInterface $liquidationPersistence,
+        private readonly MovementPersistenceInterface $movementPersistence,
         Stock $stock,
         StockPriceVO $acquisitionPrice,
         \DateTime $datetimeutc,
@@ -48,7 +51,7 @@ class Acquisition extends TransactionAbstract
         }
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->decreaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
-        $this->transactionPersistence->persist($this);
+        $this->acquisitionPersistence->persist($this);
 
         return $this;
     }
@@ -61,7 +64,7 @@ class Acquisition extends TransactionAbstract
         }
         $this->increaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->increaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
-        $this->transactionPersistence->persist($this);
+        $this->acquisitionPersistence->persist($this);
 
         return $this;
     }
@@ -69,7 +72,7 @@ class Acquisition extends TransactionAbstract
     #[\Override]
     protected function persistCreate(): void
     {
-        $repoAcquisition = $this->transactionPersistence->getRepository();
+        $repoAcquisition = $this->acquisitionPersistence->getRepository();
         if (
             false === $repoAcquisition->assertNoTransWithSameAccountStockOnDateTime(
                 $this->getAccount(),
@@ -86,24 +89,26 @@ class Acquisition extends TransactionAbstract
                 'acquisition.duplicate'
             );
         }
-        $this->transactionPersistence->beginTransaction();
+        $this->acquisitionPersistence->beginTransaction();
 
         try {
             $this->fiFoCriteriaInstance(
-                $this->transactionPersistence
+                $this->acquisitionPersistence,
+                $this->liquidationPersistence,
+                $this->movementPersistence
             )->onAcquisition($this);
-            $this->transactionPersistence->persist($this);
-            $this->transactionPersistence->flush();
-            $this->transactionPersistence->commit();
+            $this->acquisitionPersistence->persist($this);
+            $this->acquisitionPersistence->flush();
+            $this->acquisitionPersistence->commit();
         } catch (\Throwable $th) {
-            $this->transactionPersistence->rollBack();
+            $this->acquisitionPersistence->rollBack();
 
             throw $th;
         }
     }
 
     public function persistRemove(
-        TransactionPersistenceInterface $transactionPersistence
+        AcquisitionPersistenceInterface $acquisitionPersistence
     ): void {
         if ($this->getAmount()->different($this->getAmountActionable())) {
             throw new DomainViolationException(
@@ -115,8 +120,8 @@ class Acquisition extends TransactionAbstract
                 'acquisition.amountOutstanding'
             );
         }
-        $repoAcquisition = $transactionPersistence->getRepository();
-        $transactionPersistence->remove($this);
-        $transactionPersistence->flush();
+        $repoAcquisition = $acquisitionPersistence->getRepository();
+        $acquisitionPersistence->remove($this);
+        $acquisitionPersistence->flush();
     }
 }

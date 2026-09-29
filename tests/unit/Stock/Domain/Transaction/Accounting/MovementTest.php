@@ -21,9 +21,8 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenc
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationRepositoryInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
@@ -46,19 +45,17 @@ class MovementTest extends TestCase
 {
     private Stock&Stub $stock;
     private MovementRepositoryInterface&Stub $repoMovement;
-    private AcquisitionRepositoryInterface&Stub $repoAcquisition;
-    private LiquidationRepositoryInterface&Stub $repoLiquidation;
     private MovementPersistenceInterface&Stub $movementPersistence;
     private AcquisitionPersistenceInterface&Stub $acquisitionPersistence;
+    private LiquidationPersistenceInterface&Stub $liquidationPersistence;
 
     public function setUp(): void
     {
         $this->repoMovement = $this->createStub(MovementRepositoryInterface::class);
-        $this->repoAcquisition = $this->createStub(AcquisitionRepositoryInterface::class);
-        $this->repoLiquidation = $this->createStub(LiquidationRepositoryInterface::class);
         $this->movementPersistence = $this->createStub(MovementPersistenceInterface::class);
         $this->movementPersistence->method('getRepository')->willReturn($this->repoMovement);
         $this->acquisitionPersistence = $this->createStub(AcquisitionPersistenceInterface::class);
+        $this->liquidationPersistence = $this->createStub(LiquidationPersistenceInterface::class);
         $this->stock = $this->createStub(Stock::class);
         $this->stock->method('sameId')->willReturn(true);
     }
@@ -98,7 +95,7 @@ class MovementTest extends TestCase
         $liquidation->method('getCurrency')->willReturn($currency);
         $liquidation->method('getExpensesUnaccountedFor')->willReturn(new TransactionExpenseVO($liquidationExpenses, $currency));
 
-        $accountingMovement = new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
+        $accountingMovement = new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
         $this->assertSame($acquisition, $accountingMovement->getAcquisition());
         $this->assertSame($liquidation, $accountingMovement->getLiquidation());
         $this->assertTrue($accountingMovement->sameId($accountingMovement));
@@ -132,7 +129,7 @@ class MovementTest extends TestCase
         $liquidation->method('getStock')->willReturn($stock);
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('transactionAssertStock');
-        new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
+        new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
     }
 
     public function testLiquidationDateNotAfterAcquistionThrowsException(): void
@@ -152,7 +149,7 @@ class MovementTest extends TestCase
         $liquidation->method('getPrice')->willReturn($price);
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('accountingMovementAssertDateTime');
-        new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
+        new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
     }
 
     public function testSameIdWithInvalidEntityThrowsException(): void
@@ -181,7 +178,7 @@ class MovementTest extends TestCase
         $liquidation->method('getDateTimeUtc')->willReturn(new \DateTime('20 minutes ago'));
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('accountingMovementAcquisitionHasNoAmountOutstanding');
-        new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
+        new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
     }
 
     public function testLiquidationWithoutAmountRemainingThrowsException(): void
@@ -197,6 +194,6 @@ class MovementTest extends TestCase
         $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO('0'));
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('accountingMovementLiquidationHasNoAmountRemaining');
-        new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
+        new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
     }
 }

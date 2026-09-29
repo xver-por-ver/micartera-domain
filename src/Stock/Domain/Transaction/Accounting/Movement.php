@@ -31,6 +31,7 @@ class Movement implements EntityInterface
     public function __construct(
         MovementPersistenceInterface $movementPersistence,
         AcquisitionPersistenceInterface $acquisitionPersistence,
+        LiquidationPersistenceInterface $liquidationPersistence,
         private readonly Acquisition $acquisition,
         private readonly Liquidation $liquidation
     ) {
@@ -44,7 +45,7 @@ class Movement implements EntityInterface
         $this->setAcquisitionExpenses();
         $this->setLiquidationExpenses();
         $this->acquisition->accountMovement($acquisitionPersistence, $this);
-        $this->liquidation->accountMovement($this);
+        $this->liquidation->accountMovement($liquidationPersistence, $this);
         $movementPersistence->persist($this);
     }
 

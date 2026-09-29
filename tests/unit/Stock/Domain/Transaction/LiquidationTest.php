@@ -180,7 +180,7 @@ class LiquidationTest extends TestCase
         $movement = $this->createStub(Movement::class);
         $movement->method('getLiquidation')->willReturn($transaction2);
         $this->expectException(\InvalidArgumentException::class);
-        $transaction1->accountMovement($movement);
+        $transaction1->accountMovement($this->liquidationPersistence, $movement);
     }
 
     public function testSameIdWithIncorrectEntityArgumentThrowsException(): void
@@ -222,7 +222,7 @@ class LiquidationTest extends TestCase
         $movement = $this->createMock(Movement::class);
         $movement->expects($this->once())->method('getAmount')->willReturn(self::$amount);
         $movement->expects($this->exactly(2))->method('getLiquidationExpenses')->willReturn($this->expenses);
-        $this->assertSame($transaction, $transaction->accountMovement($movement));
+        $this->assertSame($transaction, $transaction->accountMovement($this->liquidationPersistence, $movement));
         $this->assertSame('0', $transaction->getAmountActionable()->getValue());
         $this->assertEquals(new TransactionExpenseVO('0.00', $this->currency), $transaction->getExpensesUnaccountedFor());
         $acquisitionsCollection = $transaction->clearMovementCollection($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence);
@@ -242,7 +242,7 @@ class LiquidationTest extends TestCase
         $movement->expects($this->once())->method('getLiquidationExpenses')->willReturn($this->expenses->add(new TransactionExpenseVO('1', $this->currency)));
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('InvalidMovementExpensesAmount');
-        $transaction->accountMovement($movement);
+        $transaction->accountMovement($this->liquidationPersistence, $movement);
     }
 
     public function testMovementAmountGreaterThanAmountRemainingThrowsException(): void
@@ -259,7 +259,7 @@ class LiquidationTest extends TestCase
         $movement->expects($this->once())->method('getLiquidationExpenses')->willReturn(new TransactionExpenseVO('4.56', $this->currency));
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('MovementAmountNotWithinAllowedLimits');
-        $transaction->accountMovement($movement);
+        $transaction->accountMovement($this->liquidationPersistence, $movement);
     }
 
     public function testCreateIsRolledBackOnTransactionException(): void

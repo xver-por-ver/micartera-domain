@@ -155,7 +155,7 @@ class FiFoCriteria
         foreach ($this->acquisitionsCollection->toArray() as $acquisition) {
             if ($acquisition->getAmountActionable()->greater(new TransactionAmountActionableVO('0'))) {
                 try {
-                    new Movement($this->movementPersistence, $this->acquisitionPersistence, $acquisition, $liquidation);
+                    new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
                 } catch (DomainViolationException $dv) {
                     throw new DomainViolationException(
                         new TranslatableMessage(

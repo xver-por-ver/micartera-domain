@@ -73,14 +73,17 @@ class Liquidation extends TransactionAbstract
         return $updatedAcquisitionsCollection;
     }
 
-    public function accountMovement(Movement $movement): self {
+    public function accountMovement(
+        LiquidationPersistenceInterface $liquidationPersistence,
+        Movement $movement
+    ): self {
         if (false === $this->sameId($movement->getLiquidation())) {
             throw new \InvalidArgumentException();
         }
         parent::decreaseExpensesUnaccountedFor($movement->getLiquidationExpenses()); // TODO: parent::? should be $this->
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->movementCollection->add($movement);
-        $this->liquidationPersistence->persist($this);
+        $liquidationPersistence->persist($this);
 
         return $this;
     }

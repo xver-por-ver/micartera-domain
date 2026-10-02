@@ -5910,16 +5910,16 @@
         },
         {
             "name": "xver/php-auth-core",
-            "version": "2.0.0",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xver-por-ver/php-auth-core.git",
-                "reference": "4b90effbaac422907d7cacf5bf9652bf5957cc57"
+                "reference": "dc55d432dcc25275cae95f9b6e99d955e56dfc5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xver-por-ver/php-auth-core/zipball/4b90effbaac422907d7cacf5bf9652bf5957cc57",
-                "reference": "4b90effbaac422907d7cacf5bf9652bf5957cc57",
+                "url": "https://api.github.com/repos/xver-por-ver/php-auth-core/zipball/dc55d432dcc25275cae95f9b6e99d955e56dfc5d",
+                "reference": "dc55d432dcc25275cae95f9b6e99d955e56dfc5d",
                 "shasum": ""
             },
             "require": {
@@ -5954,9 +5954,9 @@
             "description": "Provides Authentication",
             "support": {
                 "issues": "https://github.com/xver-por-ver/php-auth-core/issues",
-                "source": "https://github.com/xver-por-ver/php-auth-core/tree/2.0.0"
+                "source": "https://github.com/xver-por-ver/php-auth-core/tree/2.0.2"
             },
-            "time": "2026-09-29T16:06:02+00:00"
+            "time": "2026-10-02T13:19:53+00:00"
         }
     ],
     "packages-dev": [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting;
 
 use Xver\MiCartera\Domain\Account\Domain\Account;
@@ -21,14 +23,14 @@ class SummaryVO
 
     public function __construct(
         private readonly Account $account,
-        readonly ?\DateTime $dateTimeFirstLiquidationUtc,
+        public readonly ?\DateTime $dateTimeFirstLiquidationUtc,
         private readonly SummaryDTO $summaryAllTimeDTO,
         private readonly SummaryDTO $summaryDisplayedYearDTO
     ) {
         false === is_null($dateTimeFirstLiquidationUtc)
             ? $this->yearOfFirstLiquidation = (int) $dateTimeFirstLiquidationUtc->setTimezone($this->account->getTimeZone())
                 ->format('Y')
-            : $this->yearOfFirstLiquidation = (int) (new \DateTime('now', $this->account->getTimeZone()))
+            : $this->yearOfFirstLiquidation = (int) new \DateTime('now', $this->account->getTimeZone())
                 ->format('Y')
         ;
         $this->numberOperation = new NumberOperation();

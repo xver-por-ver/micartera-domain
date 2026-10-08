@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Doctrine\Common\Collections\Collection;
@@ -80,7 +82,7 @@ class Liquidation extends TransactionAbstract
         if (false === $this->sameId($movement->getLiquidation())) {
             throw new \InvalidArgumentException();
         }
-        parent::decreaseExpensesUnaccountedFor($movement->getLiquidationExpenses()); // TODO: parent::? should be $this->
+        $this->decreaseExpensesUnaccountedFor($movement->getLiquidationExpenses());
         $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
         $this->movementCollection->add($movement);
         $liquidationPersistence->persist($this);
@@ -131,7 +133,6 @@ class Liquidation extends TransactionAbstract
         AcquisitionPersistenceInterface $acquisitionPersistence,
         MovementPersistenceInterface $movementPersistence
     ): void {
-        $repoLiquidation = $liquidationPersistence->getRepository();
         $liquidationPersistence->beginTransaction();
 
         try {

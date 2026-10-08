@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -31,7 +33,7 @@ final class AccountingDTO extends EntityCollectionQueryResponse
         private readonly int $displayYear,
         private readonly SummaryVO $summary,
         int $limit = 0,
-        readonly int $page = 0
+        public readonly int $page = 0
     ) {
         parent::__construct($accountingMovementsCollection, $limit, $page);
     }
@@ -48,7 +50,7 @@ final class AccountingDTO extends EntityCollectionQueryResponse
 
     public function getCurrentYear(): int
     {
-        return (int) (new \DateTime('now', $this->account->getTimeZone()))->format('Y');
+        return (int) new \DateTime('now', $this->account->getTimeZone())->format('Y');
     }
 
     public function getDisplayedYear(): int

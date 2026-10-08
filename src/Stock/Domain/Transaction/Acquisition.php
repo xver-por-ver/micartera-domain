@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -122,7 +124,6 @@ class Acquisition extends TransactionAbstract
                 'acquisition.amountOutstanding'
             );
         }
-        $repoAcquisition = $acquisitionPersistence->getRepository();
         $acquisitionPersistence->remove($this);
         $acquisitionPersistence->flush();
     }

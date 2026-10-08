@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting;
 
 use Doctrine\ORM\Query;
@@ -40,7 +42,7 @@ class MovementRepository extends EntityRepository implements MovementRepositoryI
         if (
             null === $entity
         ) {
-            throw new EntityNotFoundException('Movement', $acquisitionUuid->toString().' '.$liquidationUuid->toString());
+            throw new EntityNotFoundException('Movement', $acquisitionUuid->toString() . ' ' . $liquidationUuid->toString());
         }
 
         return $entity;
@@ -53,8 +55,8 @@ class MovementRepository extends EntityRepository implements MovementRepositoryI
         ?int $limit = 1,
         int $offset = 0
     ): MovementCollection {
-        $dateFrom = new \DateTime($year.'-01-01 00:00:00', $account->getTimeZone());
-        $dateTo = new \DateTime(($year + 1).'-01-01 00:00:00', $account->getTimeZone());
+        $dateFrom = new \DateTime($year . '-01-01 00:00:00', $account->getTimeZone());
+        $dateTo = new \DateTime(($year + 1) . '-01-01 00:00:00', $account->getTimeZone());
         $dateFrom->setTimezone(new \DateTimeZone('UTC'));
         $dateTo->setTimezone(new \DateTimeZone('UTC'));
         $qb = $this->createQueryBuilder('m')
@@ -131,13 +133,13 @@ class MovementRepository extends EntityRepository implements MovementRepositoryI
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter(
                 'date_from',
-                (new \DateTime($displayedYear.'-01-01 00:00:00', $account->getTimeZone()))
+                new \DateTime($displayedYear . '-01-01 00:00:00', $account->getTimeZone())
                     ->setTimezone(new \DateTimeZone('UTC'))
                     ->format(self::DATE_FORMAT)
             )
             ->setParameter(
                 'date_to',
-                (new \DateTime(($displayedYear + 1).'-01-01 00:00:00', $account->getTimeZone()))
+                new \DateTime(($displayedYear + 1) . '-01-01 00:00:00', $account->getTimeZone())
                     ->setTimezone(new \DateTimeZone('UTC'))
                     ->format(self::DATE_FORMAT)
             )

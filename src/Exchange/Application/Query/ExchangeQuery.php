@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Exchange\Application\Query;
 
 use Xver\MiCartera\Domain\Exchange\Domain\ExchangePersistenceInterface;

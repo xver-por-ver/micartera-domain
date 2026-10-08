@@ -106,9 +106,12 @@ class PortfolioDTOTest extends TestCase
 
     #[DataProvider('percentageProvider')]
     public function testGetPositionProfitPercentageReturnsExpectedNumber(
-        string $purchasePrice, string $currentPrice, string $transAmount, string $expenses, string $percResult
-    ): void
-    {
+        string $purchasePrice,
+        string $currentPrice,
+        string $transAmount,
+        string $expenses,
+        string $percResult
+    ): void {
         $currency = $this->createStub(Currency::class);
 
         $account = $this->createStub(Account::class);
@@ -155,7 +158,7 @@ class PortfolioDTOTest extends TestCase
 
     public static function percentageProvider(): array
     {
-        //string $purchasePrice, string $currentPrice, string $transAmount, string $expenses, string $percResult
+        // string $purchasePrice, string $currentPrice, string $transAmount, string $expenses, string $percResult
         return [
             ['100', '100', '1', '0', '0'],
             ['100', '50', '1', '0', '-50'],

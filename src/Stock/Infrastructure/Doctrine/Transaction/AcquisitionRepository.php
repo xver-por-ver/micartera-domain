@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -126,7 +128,7 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
             ->where('t.account = :account_id')
             ->andWhere('t.amountActionable.value > 0')
             ->setParameter('account_id', $account->getId(), 'uuid')
-            ->orderBy('t.'.$this->sortFieldToString($sortField), $this->sortOrderToString($sortOrder))
+            ->orderBy('t.' . $this->sortFieldToString($sortField), $this->sortOrderToString($sortOrder))
         ;
         if (0 < $limit) {
             $qb->setFirstResult($offset)->setMaxResults($limit);
@@ -146,7 +148,7 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
             't.account = :account_id',
             't.amountActionable.value > 0',
         ];
-        
+
         $parameters = new ArrayCollection([new Parameter('account_id', $account->getId(), 'uuid')]);
         if (false === is_null($stock)) {
             $and[] = 's.code = :stock_code';

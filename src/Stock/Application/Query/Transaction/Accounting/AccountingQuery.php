@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
@@ -21,7 +23,7 @@ final class AccountingQuery
         $account = $this->accountPersistence->getRepository()->findByIdentifierOrThrowException($accountIdentifier);
         $displayedYear = (
             is_null($displayedYear)
-            ? (int) (new \DateTime('now', $account->getTimeZone()))->format('Y')
+            ? (int) new \DateTime('now', $account->getTimeZone())->format('Y')
             : $displayedYear
         );
 

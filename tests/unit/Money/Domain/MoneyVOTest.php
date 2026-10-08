@@ -102,7 +102,7 @@ class MoneyVOTest extends TestCase
         $currency = $this->createStub(Currency::class);
         $currency->method('sameId')->willReturn(true);
         $m = new MoneyVO('0', $currency);
-        $e = new class('0', $currency) extends MoneyVO {};
+        $e = new class ('0', $currency) extends MoneyVO {};
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('operationRequiresBothOperandsWithSameType');
         $m->{$method}($e);
@@ -133,7 +133,7 @@ class MoneyVOTest extends TestCase
     {
         $m = new MoneyVO('0', $this->currency);
         $this->assertInstanceOf(MoneyVO::class, $m->{$method}($m));
-        $e = new class('0', $this->currency) extends MoneyVO {};
+        $e = new class ('0', $this->currency) extends MoneyVO {};
         $this->assertInstanceOf(get_class($e), $e->{$method}($e));
     }
 

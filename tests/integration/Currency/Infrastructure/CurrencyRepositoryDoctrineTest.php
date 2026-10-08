@@ -34,12 +34,12 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockPersistence;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 
 /**
@@ -115,6 +115,7 @@ class CurrencyRepositoryDoctrineTest extends IntegrationTestCase
     {
         $entity = 'Currency';
         $id = 'XXX';
+
         try {
             $this->currencyPersistence->getRepository()->findByIdOrThrowException($id);
         } catch (EntityNotFoundException $th) {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity repository-class="Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendRepository" name="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend" table="stockCashDividend" change-tracking-policy="DEFERRED_EXPLICIT">
+    <unique-constraints>
+      <unique-constraint name="UNIQ_CASH_DIVIDEND_ACCOUNT_STOCK_DATETIME" columns="account_id stock_code datetimeutc"/>
+    </unique-constraints>
+    <id name="id" type="uuid" column="id"/>
+    <field name="datetimeutc" type="datetime" column="datetimeutc" nullable="false"/>
+    <embedded name="amount" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountVO" use-column-prefix="false" />
+    <embedded name="dividendPerShare" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO" column-prefix="dividend_per_share_" />
+    <embedded name="totalDividendPayment" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO" column-prefix="total_dividend_payment_" />
+    <embedded name="expenses" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO" column-prefix="expenses_" />
+    <many-to-one field="stock" target-entity="Xver\MiCartera\Domain\Stock\Domain\Stock" fetch="EAGER">
+      <join-columns><join-column name="stock_code" referenced-column-name="code" nullable="false"/></join-columns>
+    </many-to-one>
+    <many-to-one field="account" target-entity="Xver\MiCartera\Domain\Account\Domain\Account" fetch="EAGER">
+      <join-columns><join-column name="account_id" referenced-column-name="id" nullable="false"/></join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

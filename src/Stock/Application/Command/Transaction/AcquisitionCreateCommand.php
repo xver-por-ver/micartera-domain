@@ -6,6 +6,7 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
@@ -24,7 +25,8 @@ class AcquisitionCreateCommand
         private LiquidationPersistenceInterface $liquidationPersistence,
         private MovementPersistenceInterface $movementPersistence,
         private AccountPersistenceInterface $accountPersistence,
-        private StockPersistenceInterface $stockPersistence
+        private StockPersistenceInterface $stockPersistence,
+        private ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ) {}
 
     /**
@@ -58,7 +60,8 @@ class AcquisitionCreateCommand
                 $expensesValue,
                 $account->getCurrency()
             ),
-            $account
+            $account,
+            $this->cashDividendSynchronizer
         );
     }
 }

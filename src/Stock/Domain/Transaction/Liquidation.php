@@ -9,6 +9,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
@@ -32,7 +33,8 @@ class Liquidation extends TransactionAbstract
         \DateTime $datetimeutc,
         TransactionAmountVO $amount,
         TransactionExpenseVO $expenses,
-        Account $account
+        Account $account,
+        private readonly ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ) {
         parent::__construct($stock, $liquidationPrice, $datetimeutc, $amount, $expenses, $account);
         $this->movementCollection = new MovementCollection([]);
@@ -120,6 +122,7 @@ class Liquidation extends TransactionAbstract
             )->onLiquidation($this);
             $this->liquidationPersistence->persist($this);
             $this->liquidationPersistence->flush();
+            $this->cashDividendSynchronizer?->synchronize($this->getAccount(), $this->getStock(), $this->getDateTimeUtc());
             $this->liquidationPersistence->commit();
         } catch (\Throwable $th) {
             $this->liquidationPersistence->rollBack();
@@ -131,7 +134,8 @@ class Liquidation extends TransactionAbstract
     public function persistRemove(
         LiquidationPersistenceInterface $liquidationPersistence,
         AcquisitionPersistenceInterface $acquisitionPersistence,
-        MovementPersistenceInterface $movementPersistence
+        MovementPersistenceInterface $movementPersistence,
+        ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ): void {
         $liquidationPersistence->beginTransaction();
 
@@ -143,6 +147,7 @@ class Liquidation extends TransactionAbstract
             )->onLiquidationRemoval($this);
             $liquidationPersistence->remove($this);
             $liquidationPersistence->flush();
+            $cashDividendSynchronizer?->synchronize($this->getAccount(), $this->getStock(), $this->getDateTimeUtc());
             $liquidationPersistence->commit();
         } catch (\Throwable $th) {
             $liquidationPersistence->rollBack();

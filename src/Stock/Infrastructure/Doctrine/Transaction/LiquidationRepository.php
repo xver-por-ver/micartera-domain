@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityRepository;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationCollection;
@@ -103,5 +104,24 @@ class LiquidationRepository extends EntityRepository implements LiquidationRepos
         $result = $query->getResult();
 
         return new LiquidationCollection($result);
+    }
+
+    #[\Override]
+    public function totalAmountForAccountStockAtOrBefore(Account $account, Stock $stock, \DateTime $date): Number
+    {
+        $qr = $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(t.amount.value), 0)')
+            ->where('t.account = :account_id')
+            ->andWhere('t.stock = :stock_code')
+            ->andWhere('t.datetimeutc <= :datetimeutc')
+            ->setParameter('account_id', $account->getId(), 'uuid')
+            ->setParameter('stock_code', $stock->getId())
+            ->setParameter('datetimeutc', $date->format('Y-m-d H:i:s'))
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        /** @var numeric-string */
+        $qr = is_null($qr) || false === $qr ? '0' : (string) $qr;
+        return new Number($qr);
     }
 }

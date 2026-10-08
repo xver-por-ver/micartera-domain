@@ -8,6 +8,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
@@ -27,7 +28,8 @@ class Acquisition extends TransactionAbstract
         \DateTime $datetimeutc,
         TransactionAmountVO $amount,
         TransactionExpenseVO $expenses,
-        Account $account
+        Account $account,
+        private readonly ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ) {
         parent::__construct($stock, $acquisitionPrice, $datetimeutc, $amount, $expenses, $account);
         $this->persistCreate();
@@ -103,6 +105,7 @@ class Acquisition extends TransactionAbstract
             )->onAcquisition($this);
             $this->acquisitionPersistence->persist($this);
             $this->acquisitionPersistence->flush();
+            $this->cashDividendSynchronizer?->synchronize($this->getAccount(), $this->getStock(), $this->getDateTimeUtc());
             $this->acquisitionPersistence->commit();
         } catch (\Throwable $th) {
             $this->acquisitionPersistence->rollBack();
@@ -112,7 +115,8 @@ class Acquisition extends TransactionAbstract
     }
 
     public function persistRemove(
-        AcquisitionPersistenceInterface $acquisitionPersistence
+        AcquisitionPersistenceInterface $acquisitionPersistence,
+        ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ): void {
         if ($this->getAmount()->different($this->getAmountActionable())) {
             throw new DomainViolationException(
@@ -124,7 +128,17 @@ class Acquisition extends TransactionAbstract
                 'acquisition.amountOutstanding'
             );
         }
-        $acquisitionPersistence->remove($this);
-        $acquisitionPersistence->flush();
+        $acquisitionPersistence->beginTransaction();
+
+        try {
+            $acquisitionPersistence->remove($this);
+            $acquisitionPersistence->flush();
+            $cashDividendSynchronizer?->synchronize($this->getAccount(), $this->getStock(), $this->getDateTimeUtc());
+            $acquisitionPersistence->commit();
+        } catch (\Throwable $th) {
+            $acquisitionPersistence->rollBack();
+
+            throw $th;
+        }
     }
 }

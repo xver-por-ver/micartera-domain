@@ -6,6 +6,7 @@ namespace Tests\integration;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Uid\Uuid;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Account\Infrastructure\Doctrine\AccountRepository;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
@@ -13,12 +14,18 @@ use Xver\MiCartera\Domain\Currency\Infrastructure\Doctrine\CurrencyRepository;
 use Xver\MiCartera\Domain\Exchange\Domain\Exchange;
 use Xver\MiCartera\Domain\Exchange\Infrastructure\Doctrine\ExchangeRepository;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendRepository;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
 
 /**
  * @internal
@@ -62,12 +69,30 @@ class LazynessTest extends IntegrationTestCase
         $this->invokeMethod($instance, 'assertNoTransWithSameAccountStockOnDateTime', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'findByAccountWithActionableAmount', $this->account, 'ASC');
         $this->invokeMethod($instance, 'portfolioSummary', $this->account);
+        $this->invokeMethod($instance, 'totalAmountForAccountStockAtOrBefore', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
         $instance = new LiquidationRepository(self::$registry);
         $this->invokeMethod($instance, 'findById', $this->liquidation->getId());
         $this->invokeMethod($instance, 'findByIdOrThrowException', $this->liquidation->getId());
         $this->invokeMethod($instance, 'findByStockId', $this->stock);
         $this->invokeMethod($instance, 'assertNoTransWithSameAccountStockOnDateTime', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'findByAccountStockAndDateAtOrAfter', $this->account, $this->stock, new \DateTime('2 years ago', new \DateTimeZone('UTC')));
+        $this->invokeMethod($instance, 'totalAmountForAccountStockAtOrBefore', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->loadEntities();
+        $cashDividend = new CashDividend(
+            new CashDividendPersistence(self::$registry),
+            new AcquisitionPersistence(self::$registry),
+            new LiquidationPersistence(self::$registry),
+            $this->acquisition->getStock(),
+            $this->acquisition->getAccount(),
+            $this->acquisition->getDateTimeUtc(),
+            new CashDividendMoneyVO('0.25', $this->acquisition->getAccount()->getCurrency()),
+            new CashDividendMoneyVO('0', $this->acquisition->getAccount()->getCurrency())
+        );
+        $instance = new CashDividendRepository(self::$registry);
+        $this->invokeMethod($instance, 'findById', Uuid::v4());
+        $this->invokeMethod($instance, 'findByIdOrThrowException', $cashDividend->getId());
+        $this->invokeMethod($instance, 'assertNoCashDividendOnDateTime', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->invokeMethod($instance, 'findByAccountStockAtOrAfter', $this->account, $this->stock, new \DateTime('2 years ago', new \DateTimeZone('UTC')));
         $instance = new MovementRepository(self::$registry);
         $this->invokeMethod($instance, 'findByIdOrThrowException', $this->acquisition->getId(), $this->liquidation->getId());
         $this->invokeMethod($instance, 'findByAccountAndYear', $this->account, (int) new \DateTime('now', new \DateTimeZone('UTC'))->format('Y'), null);

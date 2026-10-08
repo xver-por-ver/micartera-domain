@@ -54,6 +54,22 @@
         <source>futureDateNotAllowed</source>
         <target>Dates in the future are not allowed.</target>
       </trans-unit>
+      <trans-unit id="dividendRequiresPositiveHolding">
+        <source>dividendRequiresPositiveHolding</source>
+        <target>A dividend can only be recorded when the account holds the stock on that date.</target>
+      </trans-unit>
+      <trans-unit id="cashDividendExistsOnDateTime">
+        <source>cashDividendExistsOnDateTime</source>
+        <target>A cash dividend for this account and stock already exists at that date and time.</target>
+      </trans-unit>
+      <trans-unit id="cashDividendExpensesCannotBeNegative">
+        <source>cashDividendExpensesCannotBeNegative</source>
+        <target>Cash dividend expenses cannot be negative.</target>
+      </trans-unit>
+      <trans-unit id="cashDividendPerShareMustBePositive">
+        <source>cashDividendPerShareMustBePositive</source>
+        <target>Cash dividend per share must be greater than zero.</target>
+      </trans-unit>
       <trans-unit id="transBuyCannotBeRemovedWithoutFullAmountOutstanding">
         <source>transBuyCannotBeRemovedWithoutFullAmountOutstanding</source>
         <target>Buy transaction can only be removed when full amount is outstanding.</target>

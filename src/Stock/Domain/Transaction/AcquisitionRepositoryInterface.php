@@ -6,6 +6,7 @@ namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Symfony\Component\Uid\Uuid;
 use Xver\MiCartera\Domain\Account\Domain\Account;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Portfolio\SummaryVO;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityRepositoryInterface;
@@ -49,4 +50,6 @@ interface AcquisitionRepositoryInterface extends EntityRepositoryInterface
         Account $account,
         ?Stock $stock = null
     ): SummaryVO;
+
+    public function totalAmountForAccountStockAtOrBefore(Account $account, Stock $stock, \DateTime $date): Number;
 }

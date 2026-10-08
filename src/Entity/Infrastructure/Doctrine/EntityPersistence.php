@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine;
 
 use Doctrine\ORM\EntityManager;
@@ -16,9 +18,7 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 abstract class EntityPersistence implements EntityPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry, private String $entityClass) 
-    { 
-    }
+    public function __construct(private ManagerRegistry $managerRegistry, private string $entityClass) {}
 
     /**
      * @param T $entity

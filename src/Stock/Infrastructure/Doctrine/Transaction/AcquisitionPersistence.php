@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityPersistence;
@@ -17,7 +18,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class AcquisitionPersistence extends EntityPersistence implements AcquisitionPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {
+    public function __construct(private ManagerRegistry $managerRegistry)
+    {
         parent::__construct($this->managerRegistry, Acquisition::class);
     }
 

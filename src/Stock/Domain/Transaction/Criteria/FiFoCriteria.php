@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction\Criteria;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -9,11 +11,11 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Liquidation;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationCollection;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
-use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountActionableVO;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
 /**
@@ -139,7 +141,7 @@ class FiFoCriteria
     private function sortAcquisitionsByOldestFirst(): void
     {
         $acquisitionsArray = $this->acquisitionsCollection->toArray();
-        usort($acquisitionsArray, fn (Acquisition $a, Acquisition $b) => $a->getDateTimeUtc() <=> $b->getDateTimeUtc());
+        usort($acquisitionsArray, fn(Acquisition $a, Acquisition $b) => $a->getDateTimeUtc() <=> $b->getDateTimeUtc());
         $this->acquisitionsCollection = new AcquisitionCollection($acquisitionsArray);
     }
 

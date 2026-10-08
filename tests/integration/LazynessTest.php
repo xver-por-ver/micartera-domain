@@ -80,7 +80,7 @@ class LazynessTest extends IntegrationTestCase
         foreach ($this->classesMethods as $class => $methods) {
             foreach ($methods as $method => $value) {
                 if (true !== $value) {
-                    $msg .= sprintf($msgTemplate, $class, $method).PHP_EOL;
+                    $msg .= sprintf($msgTemplate, $class, $method) . PHP_EOL;
                     $allTested = false;
                 }
             }
@@ -109,7 +109,7 @@ class LazynessTest extends IntegrationTestCase
 
     private function getClassesMethods(): void
     {
-        $srcDir = realpath(__DIR__.'/../../src');
+        $srcDir = realpath(__DIR__ . '/../../src');
         $finder = new Finder();
         $finder->files()->in($srcDir)->name('*Repository.php');
         $excluded = [
@@ -122,7 +122,7 @@ class LazynessTest extends IntegrationTestCase
                 $namespace = trim($nsMatch[1]);
                 if (preg_match('/class\s+(\w+)/', $contents, $classMatch)) {
                     $className = $classMatch[1];
-                    $fqcn = $namespace.'\\'.$className;
+                    $fqcn = $namespace . '\\' . $className;
                     if (class_exists($fqcn)) {
                         $reflection = new \ReflectionClass($fqcn);
                         if ($reflection->isAbstract()) {
@@ -138,10 +138,10 @@ class LazynessTest extends IntegrationTestCase
                         }
                         $methods = array_filter(
                             array_map(
-                                fn ($m) => $m->name,
+                                fn($m) => $m->name,
                                 $reflection->getMethods(\ReflectionMethod::IS_PUBLIC)
                             ),
-                            fn ($name) => !str_starts_with($name, '__') && !in_array(strtolower($name), $excluded, true) && !in_array($name, $parentMethods, true)
+                            fn($name) => !str_starts_with($name, '__') && !in_array(strtolower($name), $excluded, true) && !in_array($name, $parentMethods, true)
                         );
                         foreach ($methods as $method) {
                             $this->classesMethods[$fqcn][$method] = false;

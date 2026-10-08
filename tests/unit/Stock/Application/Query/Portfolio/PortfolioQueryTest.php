@@ -34,7 +34,7 @@ class PortfolioQueryTest extends TestCase
     private AcquisitionRepositoryInterface&Stub $repoAcquisition;
     private StockPersistenceInterface&Stub $stockPersistence;
     private AccountPersistenceInterface&Stub $accountPersistence;
-    private Stub&AcquisitionPersistenceInterface $acquisitionPersistence;
+    private AcquisitionPersistenceInterface&Stub $acquisitionPersistence;
 
     public function setUp(): void
     {

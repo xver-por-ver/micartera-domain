@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -146,8 +148,6 @@ abstract class TransactionAbstract implements EntityInterface
                 'transaction.expenses'
             );
         }
-
-        $numberOperation = new NumberOperation();
 
         $this->expensesUnaccountedFor = $expensesUnaccountedFor->subtract($delta);
     }

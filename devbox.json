@@ -1,7 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.2/.schema/devbox.schema.json",
   "env": {
-    "PHP_CS_FIXER_IGNORE_ENV": "true"
   },
   "packages": [
     "php@8.5.9",

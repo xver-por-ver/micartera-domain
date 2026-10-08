@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Number\Domain;
 
 final class NumberOperation
@@ -98,55 +100,57 @@ final class NumberOperation
         NumberInterface $operand1,
         NumberInterface $operand2
     ): string {
+        $result = null;
+
         if ($this->same($operandsDecimals, new Number('0'), $operand1) && $this->same($operandsDecimals, new Number('0'), $operand2)) {
-            return $this->round(
+            $result = $this->round(
                 $outputDecimals,
                 new Number('0'),
                 \RoundingMode::HalfAwayFromZero
             );
-        }
-        if ($this->different($operandsDecimals, new Number('0'), $operand1) && $this->same($operandsDecimals, new Number('0'), $operand2)) {
-            return $this->round(
+        } elseif ($this->different($operandsDecimals, new Number('0'), $operand1) && $this->same($operandsDecimals, new Number('0'), $operand2)) {
+            $result = $this->round(
                 $outputDecimals,
                 new Number('-100'),
                 \RoundingMode::HalfAwayFromZero
             );
-        }
-        if ($this->same($operandsDecimals, new Number('0'), $operand1) && $this->different($operandsDecimals, new Number('0'), $operand2)) {
-            return $this->round(
+        } elseif ($this->same($operandsDecimals, new Number('0'), $operand1) && $this->different($operandsDecimals, new Number('0'), $operand2)) {
+            $result = $this->round(
                 $outputDecimals,
                 new Number('100'),
                 \RoundingMode::HalfAwayFromZero
             );
+        } else {
+            $divResult = new Number(
+                $this->divide(
+                    $operandsDecimals + 3,
+                    new Number(
+                        $this->subtract(
+                            $operandsDecimals + 3,
+                            $operand2,
+                            $operand1
+                        )
+                    ),
+                    $operand1
+                )
+            );
+
+            $mulResult = new Number(
+                $this->multiply(
+                    $operandsDecimals + 3,
+                    $divResult,
+                    new Number('100')
+                )
+            );
+
+            $result = $this->round(
+                $outputDecimals,
+                $mulResult,
+                \RoundingMode::HalfAwayFromZero
+            );
         }
 
-        $divResult = new Number(
-            $this->divide(
-                $operandsDecimals + 3,
-                new Number(
-                    $this->subtract(
-                        $operandsDecimals + 3,
-                        $operand2,
-                        $operand1
-                    )
-                ),
-                $operand1
-            )
-        );
-
-        $mulResult = new Number(
-            $this->multiply(
-                $operandsDecimals + 3,
-                $divResult,
-                new Number('100')
-            )
-        );
-
-        return $this->round(
-            $outputDecimals,
-            $mulResult,
-            \RoundingMode::HalfAwayFromZero
-        );
+        return $result;
     }
 
     /**

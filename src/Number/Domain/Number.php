@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Number\Domain;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -52,14 +54,14 @@ class Number implements NumberInterface
 
     public function getValueFormatted(): string
     {
-        $decimalStrSuffix = '.'.str_pad('', $this->getMaxDecimals(), '0');
+        $decimalStrSuffix = '.' . str_pad('', $this->getMaxDecimals(), '0');
         if (false !== $pos = strpos($this->getValue(), '.')) {
             $decimalStr = substr($this->getValue(), $pos + 1);
             $decimalStrLength = strlen($decimalStr);
             $decimalStrSuffix = str_pad('', $this->getMaxDecimals() - $decimalStrLength, '0');
         }
 
-        return $this->getValue().$decimalStrSuffix;
+        return $this->getValue() . $decimalStrSuffix;
     }
 
     public function greater(NumberInterface $operand): bool
@@ -116,7 +118,7 @@ class Number implements NumberInterface
                     [],
                     'MiCarteraDomain'
                 ),
-                $this->numberPropertyName.'.value'
+                $this->numberPropertyName . '.value'
             );
         }
     }
@@ -128,7 +130,7 @@ class Number implements NumberInterface
         $decimals = isset($matches[4]) ? rtrim($matches[4], '0') : '';
 
         /** @psalm-var numeric-string */
-        $this->value = ($hole || strlen($decimals) ? $matches[1] : '').(string) $hole.(strlen($decimals) ? '.'.$decimals : '');
+        $this->value = ($hole || strlen($decimals) ? $matches[1] : '') . (string) $hole . (strlen($decimals) ? '.' . $decimals : '');
     }
 
     protected function assertDecimalPlaces(): void
@@ -136,7 +138,7 @@ class Number implements NumberInterface
         if (0 === $this->getMaxDecimals()) {
             $regex = '/^(?:-)?\d+$/';
         } else {
-            $regex = '/^(?:-)?\d+(?:\.{1}\d{1,'.$this->maxDecimals.'})?$/';
+            $regex = '/^(?:-)?\d+(?:\.{1}\d{1,' . $this->maxDecimals . '})?$/';
         }
         if (0 === preg_match($regex, $this->getValue())) {
             throw new DomainViolationException(
@@ -145,7 +147,7 @@ class Number implements NumberInterface
                     ['precision' => $this->maxDecimals],
                     'MiCarteraDomain'
                 ),
-                $this->numberPropertyName.'.value'
+                $this->numberPropertyName . '.value'
             );
         }
     }
@@ -166,7 +168,7 @@ class Number implements NumberInterface
                     ['minimum' => $this->valueMin, 'maximum' => $this->valueMax],
                     'MiCarteraDomain'
                 ),
-                $this->numberPropertyName.'.value'
+                $this->numberPropertyName . '.value'
             );
         }
     }

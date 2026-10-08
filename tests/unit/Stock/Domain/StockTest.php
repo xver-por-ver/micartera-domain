@@ -40,7 +40,7 @@ class StockTest extends TestCase
     private StockRepositoryInterface&Stub $repoStock;
     private AcquisitionRepositoryInterface&Stub $repoAcquisition;
     private Exchange&Stub $exchange;
-    private StockPersistenceInterface&MockObject $stockPersistence;
+    private MockObject&StockPersistenceInterface $stockPersistence;
 
     public function setUp(): void
     {
@@ -61,8 +61,8 @@ class StockTest extends TestCase
     {
         $this->stockPersistence->expects($this->once())->method('persist');
         $this->currency->method('sameId')->willReturn(true);
-        $code = "TEST";
-        $name = "TEST NAME";
+        $code = 'TEST';
+        $name = 'TEST NAME';
         $stock = new Stock($this->stockPersistence, $code, $name, $this->stockPrice, $this->exchange);
         $this->assertInstanceOf(Stock::class, $stock);
         $this->assertTrue($stock->sameId($stock));
@@ -152,7 +152,7 @@ class StockTest extends TestCase
         $newStockPrice = $this->createStub(StockPriceVO::class);
         $newStockPrice->method('getValue')->willReturn('6.7824');
 
-        $stock = new Stock($this->stockPersistence, 'TEST', 'TEST NAME', $this->stockPrice, $this->exchange);       
+        $stock = new Stock($this->stockPersistence, 'TEST', 'TEST NAME', $this->stockPrice, $this->exchange);
         $stock->persistUpdate($this->stockPersistence, $stock->getName(), $newStockPrice);
         $this->assertSame('6.7824', $stock->getPrice()->getValue());
     }
@@ -229,7 +229,7 @@ class StockTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessageIs('simulating exception');
 
-        $stock = new Stock($this->stockPersistence, 'TEST', 'TEST NAME', $this->stockPrice, $this->exchange);   
+        $stock = new Stock($this->stockPersistence, 'TEST', 'TEST NAME', $this->stockPrice, $this->exchange);
         $stock->persistRemove($this->stockPersistence);
     }
 }

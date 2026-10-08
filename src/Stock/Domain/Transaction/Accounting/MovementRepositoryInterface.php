@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting;
 
 use Symfony\Component\Uid\Uuid;

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use Symfony\Component\Dotenv\Dotenv;
 use Xver\MiCartera\Domain\Kernel;
 
-require dirname(__DIR__).'/vendor/autoload.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
 if (method_exists(Dotenv::class, 'bootEnv')) {
-    new Dotenv()->bootEnv(dirname(__DIR__).'/.env');
+    new Dotenv()->bootEnv(dirname(__DIR__) . '/.env');
 }
 
 if ($_SERVER['APP_DEBUG']) {
@@ -25,6 +27,6 @@ if (is_array($testsuite) && isset($testsuite['testsuite'])) {
         || in_array('application', $testsuites)
         || in_array('all', $testsuites)
     ) {
-        require dirname(__DIR__).'/tests/TestDbSetup.php';
+        require dirname(__DIR__) . '/tests/TestDbSetup.php';
     }
 }

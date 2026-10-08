@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Application\Query\Portfolio;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -31,7 +33,7 @@ final class PortfolioDTO extends EntityCollectionQueryResponse
         AcquisitionCollection $outstandingPositionsCollection,
         private readonly SummaryVO $summary,
         int $limit = 0,
-        readonly int $page = 0
+        public readonly int $page = 0
     ) {
         parent::__construct($outstandingPositionsCollection, $limit, $page);
         $this->numberOperation = new NumberOperation();
@@ -129,8 +131,9 @@ final class PortfolioDTO extends EntityCollectionQueryResponse
             $this->getPositionAcquisitionExpenses($offset)->getValue(),
             $this->getAccount()->getCurrency()
         );
-        return new StockProfitVO
-            ($this->numberOperation->add(
+
+        return new StockProfitVO(
+            $this->numberOperation->add(
                 $this->getPositionAcquisitionPrice($offset)->getMaxDecimals(),
                 $this->getPositionAcquisitionPrice($offset),
                 $positionExpensesAsStockProfit

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Xver\MiCartera\Domain\Currency\Domain\Currency;

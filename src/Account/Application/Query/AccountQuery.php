@@ -6,7 +6,7 @@ namespace Xver\MiCartera\Domain\Account\Application\Query;
 
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
-use Xver\SymfonyAuthBundle\Account\Application\Query\AccountQueryInterface;
+use Xver\PhpAuthCoreBundle\Account\Application\Query\AccountQueryInterface;
 
 final class AccountQuery implements AccountQueryInterface
 {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Xver\MiCartera\Domain\Account\Domain;
 
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
-use Xver\SymfonyAuthBundle\Account\Domain\AccountRepositoryInterface as DomainAccountRepositoryInterface;
+use Xver\PhpAuthCoreBundle\Account\Domain\AccountRepositoryInterface as DomainAccountRepositoryInterface;
 
 interface AccountRepositoryInterface extends DomainAccountRepositoryInterface
 {

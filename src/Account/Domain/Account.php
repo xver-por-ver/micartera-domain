@@ -7,7 +7,7 @@ namespace Xver\MiCartera\Domain\Account\Domain;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
-use Xver\SymfonyAuthBundle\Account\Domain\Account as BaseAccount;
+use Xver\PhpAuthCoreBundle\Account\Domain\Account as BaseAccount;
 
 /**
  * @psalm-api

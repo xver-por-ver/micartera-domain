@@ -37,7 +37,7 @@
         "symfony/runtime": "^8.1",
         "symfony/uid": "^8.1",
         "symfony/yaml": "^8.1",
-        "xver/php-auth-core": "^2.0"
+        "xver/php-auth-core": "^3.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",

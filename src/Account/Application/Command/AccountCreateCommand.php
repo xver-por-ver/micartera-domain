@@ -32,7 +32,7 @@ final class AccountCreateCommand
                 new TranslatableMessage(
                     'mustAgreeTerms',
                     [],
-                    'SymfonyAuthBundle'
+                    'PhpAuthCoreBundle'
                 ),
                 'account.agreeTerms'
             );

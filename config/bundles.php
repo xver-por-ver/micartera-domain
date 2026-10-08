@@ -7,6 +7,6 @@ return [
     Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
-    Xver\SymfonyAuthBundle\SymfonyAuthBundle::class => ['all' => true],
+    Xver\PhpAuthCoreBundle\PhpAuthCoreBundle::class => ['all' => true],
     Xver\PhpAppCoreBundle\PhpAppCoreBundle::class => ['all' => true],
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,7 +18,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
  */
 final class LiquidationPersistence extends EntityPersistence implements LiquidationPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {
+    public function __construct(private ManagerRegistry $managerRegistry)
+    {
         parent::__construct($this->managerRegistry, Liquidation::class);
     }
 

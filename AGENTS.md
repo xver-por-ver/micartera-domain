@@ -63,6 +63,7 @@ Three specifics worth spelling out, because they are easy to get wrong:
 
 ## Everyday workflow
 
+- Run PHP and PHP-based project commands inside the project Devbox environment using `devbox run -- php ...` (for example, `devbox run -- php bin/console about`). Do not rely on a host-installed PHP runtime.
 - Run the app with `symfony serve -d`, and commands with `symfony console ...`
   (or `bin/console` when the Symfony CLI isn't available).
 - When something fails, read `var/log/dev.log` and the web profiler

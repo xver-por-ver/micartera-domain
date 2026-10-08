@@ -17,8 +17,8 @@ use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
 use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\AcquisitionCreateCommand;
-use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationCreateCommand;
 use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\AcquisitionDeleteCommand;
+use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationCreateCommand;
 use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationDeleteCommand;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
@@ -132,7 +132,7 @@ class StockOperateCommandTest extends TestCase
         $this->repoLiquidation->method('assertNoTransWithSameAccountStockOnDateTime')->willReturn(true);
         $this->repoStock->method('findByIdOrThrowException')->willReturn($this->stock);
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($this->account);
-        $command = $this->createStub(LiquidationCreateCommand::class);        
+        $command = $this->createStub(LiquidationCreateCommand::class);
         $liquidation = $command->invoke(
             'TEST',
             new \DateTime('now', new \DateTimeZone('UTC')),

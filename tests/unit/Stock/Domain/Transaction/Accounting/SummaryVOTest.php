@@ -64,7 +64,7 @@ class SummaryVOTest extends TestCase
     {
         $summary = new SummaryVO($this->account, null, $this->dto, $this->dto);
 
-        $this->assertSame((int) (new \DateTime('now', $this->tz))->format('Y'), $summary->getYearFirstLiquidation());
+        $this->assertSame((int) new \DateTime('now', $this->tz)->format('Y'), $summary->getYearFirstLiquidation());
     }
 
     public function testAllTimeAndDisplayedYearMethods(): void

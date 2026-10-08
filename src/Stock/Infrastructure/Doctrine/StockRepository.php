@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine;
 
 use Doctrine\Persistence\ManagerRegistry;

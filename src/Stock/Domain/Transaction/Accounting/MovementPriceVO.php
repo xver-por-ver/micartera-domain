@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting;
 
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
@@ -14,12 +16,4 @@ class MovementPriceVO extends MoneyVO
     protected string $valueMin = '0';
     protected int $maxDecimals = 4;
     protected string $numberPropertyName = 'movement';
-
-    /**
-     * @psalm-param numeric-string $value
-     */
-    public function __construct(string $value, Currency $currency)
-    {
-        parent::__construct($value, $currency);
-    }
 }

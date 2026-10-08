@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Account\Domain;
 
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;

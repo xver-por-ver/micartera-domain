@@ -108,7 +108,7 @@ class EntityPersistenceTest extends TestCase
     {
         $registry = $this->createStub(ManagerRegistry::class);
         $registry->method('getManager')->willReturn($this->createStub(ObjectManager::class));
-        $persistence = new class($registry) extends EntityPersistence {
+        $persistence = new class ($registry) extends EntityPersistence {
             public function __construct(ManagerRegistry $managerRegistry)
             {
                 parent::__construct($managerRegistry, DummyEntity::class);
@@ -132,7 +132,7 @@ class EntityPersistenceTest extends TestCase
         $registry = $this->createStub(ManagerRegistry::class);
         $registry->method('getManager')->willReturn($entityManager);
 
-        return new class($registry) extends EntityPersistence {
+        return new class ($registry) extends EntityPersistence {
             public function __construct(ManagerRegistry $managerRegistry)
             {
                 parent::__construct($managerRegistry, DummyEntity::class);

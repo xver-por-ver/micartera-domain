@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain;
 
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
@@ -23,12 +25,4 @@ class StockPriceVO extends MoneyVO
     protected string $valueMax = self::VALUE_MAX;
     protected int $maxDecimals = 4;
     protected string $numberPropertyName = 'stock';
-
-    /**
-     * @psalm-param numeric-string $value
-     */
-    public function __construct(string $value, Currency $currency)
-    {
-        parent::__construct($value, $currency);
-    }
 }

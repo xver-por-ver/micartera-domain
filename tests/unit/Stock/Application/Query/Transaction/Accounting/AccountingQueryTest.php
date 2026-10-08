@@ -33,7 +33,7 @@ class AccountingQueryTest extends TestCase
     private AccountRepositoryInterface&Stub $repoAccount;
     private MovementRepositoryInterface&Stub $repoMovement;
     private AccountPersistenceInterface&Stub $accountPersistence;
-    private Stub&MovementPersistenceInterface $movementPersistence;
+    private MovementPersistenceInterface&Stub $movementPersistence;
 
     public function setUp(): void
     {

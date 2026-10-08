@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Currency\Infrastructure\Doctrine;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,12 +16,13 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
 /**
  * @template T of EntityInterface
- * 
+ *
  * @template-extends EntityPersistence<Currency>
  */
 final class CurrencyPersistence extends EntityPersistence implements CurrencyPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {
+    public function __construct(private ManagerRegistry $managerRegistry)
+    {
         parent::__construct($this->managerRegistry, Currency::class);
     }
 

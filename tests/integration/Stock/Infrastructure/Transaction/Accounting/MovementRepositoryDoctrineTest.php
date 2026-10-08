@@ -37,12 +37,12 @@ use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionExpenseVO;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockPersistence;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\StockRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
-use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\AcquisitionRepository;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationPersistence;
+use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationRepository;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 
 /**
@@ -121,11 +121,12 @@ class MovementRepositoryDoctrineTest extends IntegrationTestCase
         $entity = 'Movement';
         $uuid1 = Uuid::v4();
         $uuid2 = Uuid::v4();
+
         try {
             $this->movementPersistence->getRepository()->findByIdOrThrowException($uuid1, $uuid2);
         } catch (EntityNotFoundException $th) {
             $this->assertSame('entityNotFound', $th->getTranslatableMessage()->getMessage());
-            $this->assertSame(['entity' => $entity, 'identifier' => $uuid1->toString().' '.$uuid2->toString()], $th->getTranslatableMessage()->getParameters());
+            $this->assertSame(['entity' => $entity, 'identifier' => $uuid1->toString() . ' ' . $uuid2->toString()], $th->getTranslatableMessage()->getParameters());
             $this->assertSame('PhpAppCore', $th->getTranslatableMessage()->getDomain());
         }
     }
@@ -137,7 +138,7 @@ class MovementRepositoryDoctrineTest extends IntegrationTestCase
         $movementCollection = $this->movementPersistence->getRepository()->findByAccountAndYear($this->account, $lastYear);
         $this->assertInstanceOf(MovementCollection::class, $movementCollection);
         $this->assertSame(0, $movementCollection->count());
-        $dateAcquisition = new \DateTime('first day of january '.$lastYear, new \DateTimeZone('UTC'));
+        $dateAcquisition = new \DateTime('first day of january ' . $lastYear, new \DateTimeZone('UTC'));
         $dateLiquidation = (clone $dateAcquisition)->add(new \DateInterval('PT1S'));
         $acquisition = new Acquisition($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), $dateAcquisition, new TransactionAmountVO('100'), $this->expenses, $this->account);
         $liquidation = new Liquidation($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), $dateLiquidation, new TransactionAmountVO('100'), $this->expenses, $this->account);

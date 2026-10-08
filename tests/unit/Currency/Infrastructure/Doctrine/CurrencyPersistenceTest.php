@@ -7,7 +7,6 @@ namespace Tests\unit\Currency\Infrastructure\Doctrine;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Currency\Domain\CurrencyRepositoryInterface;
 use Xver\MiCartera\Domain\Currency\Infrastructure\Doctrine\CurrencyPersistence;
 use Xver\MiCartera\Domain\Currency\Infrastructure\Doctrine\CurrencyRepository;

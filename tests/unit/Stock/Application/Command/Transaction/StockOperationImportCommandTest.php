@@ -131,13 +131,13 @@ class StockOperationImportCommandTest extends TestCase
         $date = new \DateTime('yesterday', new \DateTimeZone('UTC'));
 
         return [
-            [[$date->format('Y-m-d H:i:s'), 'invalid', 'TEST', '5.66', 100, '3.67'], 'transaction.type', 'invalidTransactionType', ['type' => 'invalid'], 'MiCarteraDomain'], // Invalid transaction type
-            [[$date->format('Y-m-d'), 'acquisition', 'TEST', '5.66', 100, '3.67'], 'transaction.datetimeutc', 'failedCreatingDateObjectFromString', ['format' => 'Y-m-d H:i:s'], 'MiCarteraDomain'], // Invalid date
-            [[$date->format('Y-m-d H:i:s'), 'acquisition', 'TEST', '5,66', 100, '3.67'], 'stock.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid price format
-            [[$date->format('Y-m-d H:i:s'), 'acquisition', 'TEST', '5.66', 100, '3,67'], 'expense.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid expenses format
-            [[$date->format('Y-m-d'), 'liquidation', 'TEST', '5.66', 100, '3.67'], 'transaction.datetimeutc', 'failedCreatingDateObjectFromString', ['format' => 'Y-m-d H:i:s'], 'MiCarteraDomain'], // Invalid date
-            [[$date->format('Y-m-d H:i:s'), 'liquidation', 'TEST', '5,66', 100, '3.67'], 'stock.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid price format
-            [[$date->format('Y-m-d H:i:s'), 'liquidation', 'TEST', '5.66', 100, '3,67'], 'expense.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid expenses format
+            [[$date->format('Y-m-d H:i:s'), 'invalid', 'TEST', '5.66', '100', '3.67'], 'transaction.type', 'invalidTransactionType', ['type' => 'invalid'], 'MiCarteraDomain'], // Invalid transaction type
+            [[$date->format('Y-m-d'), 'acquisition', 'TEST', '5.66', '100', '3.67'], 'transaction.datetimeutc', 'failedCreatingDateObjectFromString', ['format' => 'Y-m-d H:i:s'], 'MiCarteraDomain'], // Invalid date
+            [[$date->format('Y-m-d H:i:s'), 'acquisition', 'TEST', '5,66', '100', '3.67'], 'stock.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid price format
+            [[$date->format('Y-m-d H:i:s'), 'acquisition', 'TEST', '5.66', '100', '3,67'], 'expense.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid expenses format
+            [[$date->format('Y-m-d'), 'liquidation', 'TEST', '5.66', '100', '3.67'], 'transaction.datetimeutc', 'failedCreatingDateObjectFromString', ['format' => 'Y-m-d H:i:s'], 'MiCarteraDomain'], // Invalid date
+            [[$date->format('Y-m-d H:i:s'), 'liquidation', 'TEST', '5,66', '100', '3.67'], 'stock.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid price format
+            [[$date->format('Y-m-d H:i:s'), 'liquidation', 'TEST', '5.66', '100', '3,67'], 'expense.value', 'numberFormat', [], 'MiCarteraDomain'], // Invalid expenses format
         ];
     }
 
@@ -153,7 +153,7 @@ class StockOperationImportCommandTest extends TestCase
         try {
             $command->invoke(
                 1,
-                [$date->format('Y-m-d H:i:s'), 'acquisition', 'NONEXISTENTSTOCK', '5.66', 100, '3.67'],
+                [$date->format('Y-m-d H:i:s'), 'acquisition', 'NONEXISTENTSTOCK', '5.66', '100', '3.67'],
                 'test@example.com'
             );
         } catch (DomainViolationException $th) {

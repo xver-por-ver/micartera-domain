@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Account\Infrastructure\Doctrine;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,12 +18,13 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
 /**
  * @template T of EntityInterface
- * 
+ *
  * @template-extends EntityPersistence<Account>
  */
 final class AccountPersistence extends EntityPersistence implements AccountPersistenceInterface
 {
-    public function __construct(private ManagerRegistry $managerRegistry) {
+    public function __construct(private ManagerRegistry $managerRegistry)
+    {
         parent::__construct($this->managerRegistry, Account::class);
     }
 

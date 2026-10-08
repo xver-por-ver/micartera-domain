@@ -8,7 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Xver\MiCartera\Domain\Entity\Infrastructure\Doctrine\EntityRepository;
-use Xver\MiCartera\Domain\Exchange\Domain\Exchange;
 use Xver\MiCartera\Domain\Exchange\Domain\ExchangeRepositoryInterface;
 use Xver\MiCartera\Domain\Exchange\Infrastructure\Doctrine\ExchangePersistence;
 use Xver\MiCartera\Domain\Exchange\Infrastructure\Doctrine\ExchangeRepository;

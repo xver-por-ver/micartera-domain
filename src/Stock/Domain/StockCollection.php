@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain;
 
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityCollection;

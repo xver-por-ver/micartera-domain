@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Xver\MiCartera\Domain\Stock\Domain;
 
 use Symfony\Component\Translation\TranslatableMessage;
@@ -152,7 +154,6 @@ class Stock implements EntityInterface
             ->validPrice($price)
         ;
         $this->price = $price;
-        $repoStock = $stockPersistence->getRepository();
         $stockPersistence->persist($this);
         $stockPersistence->flush();
 
@@ -173,7 +174,6 @@ class Stock implements EntityInterface
                 'stock.code'
             );
         }
-        $repoStock = $stockPersistence->getRepository();
         $stockPersistence->remove($this);
         $stockPersistence->flush();
     }

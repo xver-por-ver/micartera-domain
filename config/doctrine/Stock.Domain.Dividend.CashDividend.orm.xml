@@ -2,7 +2,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
   <entity repository-class="Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendRepository" name="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend" table="stockCashDividend" change-tracking-policy="DEFERRED_EXPLICIT">
     <unique-constraints>
-      <unique-constraint name="UNIQ_CASH_DIVIDEND_ACCOUNT_STOCK_DATETIME" columns="account_id stock_code datetimeutc"/>
+      <unique-constraint name="UNIQ_CASH_DIVIDEND_ACCOUNT_STOCK_DATETIME" columns="account_id,stock_code,datetimeutc"/>
     </unique-constraints>
     <id name="id" type="uuid" column="id"/>
     <field name="datetimeutc" type="datetime" column="datetimeutc" nullable="false"/>

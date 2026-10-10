@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSummaryVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 
 final class AccountingQuery
 {
     public function __construct(
         private AccountPersistenceInterface $accountPersistence,
-        private MovementPersistenceInterface $movementPersistence
+        private MovementPersistenceInterface $movementPersistence,
+        private CashDividendPersistenceInterface $cashDividendPersistence
     ) {}
 
     public function byAccountYear(
@@ -38,7 +41,12 @@ final class AccountingQuery
             $displayedYear,
             $this->movementPersistence->getRepository()->accountingSummaryByAccount($account, $displayedYear),
             $limit,
-            $page
+            $page,
+            new CashDividendSummaryVO(
+                $this->cashDividendPersistence->getRepository()->findByAccount($account),
+                $account,
+                $displayedYear
+            )
         );
     }
 }

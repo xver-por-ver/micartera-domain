@@ -60,6 +60,20 @@ class CashDividendRepository extends EntityRepository implements CashDividendRep
     }
 
     #[\Override]
+    public function findByAccount(Account $account): CashDividendCollection
+    {
+        /** @var array<int, CashDividend> $dividends */
+        $dividends = $this->createQueryBuilder('d')
+            ->where('d.account = :account_id')
+            ->setParameter('account_id', $account->getId(), 'uuid')
+            ->orderBy('d.datetimeutc', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return new CashDividendCollection($dividends);
+    }
+
+    #[\Override]
     public function findByAccountStock(Account $account, Stock $stock): CashDividendCollection
     {
         /** @var array<int, CashDividend> $dividends */

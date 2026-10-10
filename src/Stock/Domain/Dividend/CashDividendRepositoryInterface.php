@@ -20,6 +20,8 @@ interface CashDividendRepositoryInterface extends EntityRepositoryInterface
 
     public function assertNoCashDividendOnDateTime(Account $account, Stock $stock, \DateTime $datetimeutc): bool;
 
+    public function findByAccount(Account $account): CashDividendCollection;
+
     public function findByAccountStock(Account $account, Stock $stock): CashDividendCollection;
 
     public function findByAccountStockAtOrAfter(Account $account, Stock $stock, \DateTime $date): CashDividendCollection;

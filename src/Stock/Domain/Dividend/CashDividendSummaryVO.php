@@ -16,6 +16,7 @@ final class CashDividendSummaryVO
     private CashDividendMoneyVO $displayedYearGross;
     private CashDividendMoneyVO $displayedYearExpenses;
     private ?int $yearFirstDividend = null;
+    private CashDividendCollection $displayedYearDividends;
 
     public function __construct(
         CashDividendCollection $dividends,
@@ -27,6 +28,8 @@ final class CashDividendSummaryVO
         $this->allTimeExpenses = new CashDividendMoneyVO('0', $currency);
         $this->displayedYearGross = new CashDividendMoneyVO('0', $currency);
         $this->displayedYearExpenses = new CashDividendMoneyVO('0', $currency);
+        /** @var list<CashDividend> $displayedYearDividends */
+        $displayedYearDividends = [];
 
         $numberOperation = new NumberOperation();
         $decimals = $currency->getDecimals();
@@ -51,8 +54,15 @@ final class CashDividendSummaryVO
                     $numberOperation->add($decimals, new Number($this->displayedYearExpenses->getValue()), new Number($dividend->getExpenses()->getValue())),
                     $currency
                 );
+                $displayedYearDividends[] = $dividend;
             }
         }
+        $this->displayedYearDividends = new CashDividendCollection($displayedYearDividends);
+    }
+
+    public function getDisplayedYearDividends(): CashDividendCollection
+    {
+        return $this->displayedYearDividends;
     }
 
     public function getYearFirstDividend(): ?int

@@ -93,6 +93,8 @@ class LazynessTest extends IntegrationTestCase
         $this->invokeMethod($instance, 'findByIdOrThrowException', $cashDividend->getId());
         $this->invokeMethod($instance, 'assertNoCashDividendOnDateTime', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'findByAccountStockAtOrAfter', $this->account, $this->stock, new \DateTime('2 years ago', new \DateTimeZone('UTC')));
+        $this->invokeMethod($instance, 'findByAccount', $this->account);
+        $this->invokeMethod($instance, 'findByAccountStock', $this->account, $this->stock);
         $instance = new MovementRepository(self::$registry);
         $this->invokeMethod($instance, 'findByIdOrThrowException', $this->acquisition->getId(), $this->liquidation->getId());
         $this->invokeMethod($instance, 'findByAccountAndYear', $this->account, (int) new \DateTime('now', new \DateTimeZone('UTC'))->format('Y'), null);

@@ -56,6 +56,13 @@ class CashDividendTest extends TestCase
         self::assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
     }
 
+    public function testNetDividendPaymentSubtractsExpensesFromGrossPayment(): void
+    {
+        $cashDividend = $this->createCashDividend(new Number('200'), new Number('1'), '0.25', '1.50');
+
+        self::assertSame('48.25', $cashDividend->getNetDividendPayment()->getValue());
+    }
+
     public function testPersistUpdateRecalculatesPaymentAndPreservesHolding(): void
     {
         $cashDividend = $this->createCashDividend(new Number('200'), new Number('1'), '0.25', '0');

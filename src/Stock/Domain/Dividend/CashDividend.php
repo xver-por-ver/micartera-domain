@@ -140,6 +140,18 @@ class CashDividend implements EntityInterface
         return $this->expenses;
     }
 
+    public function getNetDividendPayment(): CashDividendMoneyVO
+    {
+        return new CashDividendMoneyVO(
+            new NumberOperation()->subtract(
+                $this->account->getCurrency()->getDecimals(),
+                $this->totalDividendPayment,
+                $this->expenses
+            ),
+            $this->account->getCurrency()
+        );
+    }
+
     private function persistCreate(): void
     {
         if (false === $this->cashDividendPersistence->getRepository()->assertNoCashDividendOnDateTime(

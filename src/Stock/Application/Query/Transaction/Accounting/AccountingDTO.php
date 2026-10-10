@@ -9,6 +9,8 @@ use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
 use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendCollection;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSummaryVO;
 use Xver\MiCartera\Domain\Stock\Domain\StockProfitVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
@@ -33,9 +35,55 @@ final class AccountingDTO extends EntityCollectionQueryResponse
         private readonly int $displayYear,
         private readonly SummaryVO $summary,
         int $limit = 0,
-        public readonly int $page = 0
+        public readonly int $page = 0,
+        ?CashDividendSummaryVO $cashDividendSummary = null
     ) {
         parent::__construct($accountingMovementsCollection, $limit, $page);
+        $this->cashDividendSummary = $cashDividendSummary ?? new CashDividendSummaryVO(new CashDividendCollection([]), $account, $displayYear);
+    }
+
+    private readonly CashDividendSummaryVO $cashDividendSummary;
+
+    public function getCashDividendSummary(): CashDividendSummaryVO
+    {
+        return $this->cashDividendSummary;
+    }
+
+    public function getAllTimeCombinedNetResult(): MoneyVO
+    {
+        return $this->combinedNetResult(
+            $this->summary->getAllTimeProfitPrice(),
+            $this->cashDividendSummary->getAllTimeNet()
+        );
+    }
+
+    public function getDisplayedYearCombinedNetResult(): MoneyVO
+    {
+        return $this->combinedNetResult(
+            $this->summary->getDisplayedYearProfitPrice(),
+            $this->cashDividendSummary->getDisplayedYearNet()
+        );
+    }
+
+    private function combinedNetResult(MoneyVO $realizedProfit, MoneyVO $netDividends): MoneyVO
+    {
+        $currency = $this->account->getCurrency();
+        $amount = new NumberOperation()->add(
+            $currency->getDecimals(),
+            new Number($realizedProfit->getValue()),
+            new Number($netDividends->getValue())
+        );
+
+        return new MoneyVO($amount, $currency);
+    }
+
+    public function getYearFirstOperation(): int
+    {
+        $firstDividendYear = $this->cashDividendSummary->getYearFirstDividend();
+
+        return null === $firstDividendYear
+            ? $this->summary->getYearFirstLiquidation()
+            : min($this->summary->getYearFirstLiquidation(), $firstDividendYear);
     }
 
     public function getAccount(): Account

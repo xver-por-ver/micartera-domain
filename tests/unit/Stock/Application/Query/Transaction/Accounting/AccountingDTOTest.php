@@ -14,6 +14,8 @@ use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting\AccountingDTO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSummaryVO;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockProfitVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
@@ -33,6 +35,8 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(MoneyVO::class)]
 #[UsesClass(NumberOperation::class)]
 #[UsesClass(StockProfitVO::class)]
+#[UsesClass(CashDividendMoneyVO::class)]
+#[UsesClass(CashDividendSummaryVO::class)]
 class AccountingDTOTest extends TestCase
 {
     private Account&Stub $account;
@@ -74,6 +78,21 @@ class AccountingDTOTest extends TestCase
         $this->assertInstanceOf(MovementPriceVO::class, $accountingDTO->getMovementLiquidationPrice(0));
         $this->assertSame('0', $accountingDTO->getMovementProfitPercentage(0)->getValue());
         $this->assertInstanceOf(MoneyVO::class, $accountingDTO->getMovementProfitPrice(0));
+    }
+
+    public function testDividendSummaryAndCombinedNetResults(): void
+    {
+        $currency = $this->account->getCurrency();
+        $summary = $this->createStub(SummaryVO::class);
+        $summary->method('getAllTimeProfitPrice')->willReturn(new MoneyVO('5', $currency));
+        $summary->method('getDisplayedYearProfitPrice')->willReturn(new MoneyVO('3', $currency));
+        $summary->method('getYearFirstLiquidation')->willReturn(2022);
+        $dto = new AccountingDTO($this->account, new MovementCollection([]), 2024, $summary);
+
+        self::assertInstanceOf(CashDividendSummaryVO::class, $dto->getCashDividendSummary());
+        self::assertSame('5', $dto->getAllTimeCombinedNetResult()->getValue());
+        self::assertSame('3', $dto->getDisplayedYearCombinedNetResult()->getValue());
+        self::assertSame(2022, $dto->getYearFirstOperation());
     }
 
     public function testAccountingDTOWithNoAccountingMovements(): void

@@ -7,6 +7,7 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\LiquidationPersistenceInterface;
@@ -23,7 +24,8 @@ class StockOperationImportCommand
         private LiquidationPersistenceInterface $liquidationPersistence,
         private MovementPersistenceInterface $movementPersistence,
         private AccountPersistenceInterface $accountPersistence,
-        private StockPersistenceInterface $stockPersistence
+        private StockPersistenceInterface $stockPersistence,
+        private ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ) {}
 
     /**
@@ -46,8 +48,8 @@ class StockOperationImportCommand
             }
             $command
                 = 'acquisition' === $type
-                ? new AcquisitionCreateCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence)
-                : new LiquidationCreateCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence);
+                ? new AcquisitionCreateCommand($this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence, $this->cashDividendSynchronizer)
+                : new LiquidationCreateCommand($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence, $this->accountPersistence, $this->stockPersistence, $this->cashDividendSynchronizer);
             $command->invoke(
                 $line[2],
                 $dateTime,

@@ -197,6 +197,14 @@ class CashDividendTest extends TestCase
         $this->assertSame('0.2', $cashDividend->getTotalDividendPayment()->getValue());
     }
 
+    public function testDividendPerShareRejectsMoreThanTenDecimalPlaces(): void
+    {
+        $this->expectException(DomainViolationException::class);
+        $this->expectExceptionMessageIs('numberPrecision');
+
+        $this->createCashDividend(new Number('200'), new Number('0'), '0.12345678901', '0');
+    }
+
     public function testRejectsMismatchedStockCurrency(): void
     {
         $this->expectException(DomainViolationException::class);

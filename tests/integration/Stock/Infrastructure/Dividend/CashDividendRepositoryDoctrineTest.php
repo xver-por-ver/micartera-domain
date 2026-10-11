@@ -101,6 +101,22 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
         );
     }
 
+    public function testDividendPerSharePersistsAndReloadsWithTenDecimalPlaces(): void
+    {
+        parent::$loadFixtures = true;
+        $cashDividend = $this->createCashDividend(
+            new \DateTime('yesterday', new \DateTimeZone('UTC')),
+            '0.1234567891'
+        );
+        $cashDividendId = $cashDividend->getId();
+        parent::detachEntity($cashDividendId);
+
+        $reloaded = $this->cashDividentPersistence->getRepository()->findById($cashDividendId);
+
+        $this->assertInstanceOf(CashDividend::class, $reloaded);
+        $this->assertSame('0.1234567891', $reloaded->getDividendPerShare()->getValue());
+    }
+
     public function testFindByIdOrThrowExceptionThrowsForMissingDividend(): void
     {
         $this->expectException(EntityNotFoundException::class);
@@ -190,7 +206,7 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
         $this->assertEquals($cashDividendId, $cashDividend->getId());
     }
 
-    private function createCashDividend(\DateTime $date): CashDividend
+    private function createCashDividend(\DateTime $date, string $dividendPerShare = '145'): CashDividend
     {
         return new CashDividend(
             $this->cashDividentPersistence,
@@ -199,7 +215,7 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->account,
             $date,
-            new CashDividendPerShareVO('145', $this->account->getCurrency()),
+            new CashDividendPerShareVO($dividendPerShare, $this->account->getCurrency()),
             new CashDividendMoneyVO('3', $this->account->getCurrency())
         );
     }

@@ -19,6 +19,7 @@ use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendPersistence;
@@ -52,6 +53,7 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationR
 #[UsesClass(NumberOperation::class)]
 #[UsesClass(CashDividend::class)]
 #[UsesClass(CashDividendMoneyVO::class)]
+#[UsesClass(CashDividendPerShareVO::class)]
 #[UsesClass(\Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement::class)]
 #[UsesClass(\Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition::class)]
 #[UsesClass(\Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection::class)]
@@ -178,7 +180,7 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->account,
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new CashDividendMoneyVO('145', $this->account->getCurrency()),
+            new CashDividendPerShareVO('145', $this->account->getCurrency()),
             new CashDividendMoneyVO('3', $this->account->getCurrency())
         );
         $cashDividendId = $cashDividend->getId();
@@ -197,7 +199,7 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->account,
             $date,
-            new CashDividendMoneyVO('145', $this->account->getCurrency()),
+            new CashDividendPerShareVO('145', $this->account->getCurrency()),
             new CashDividendMoneyVO('3', $this->account->getCurrency())
         );
     }

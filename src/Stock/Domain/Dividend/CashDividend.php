@@ -31,7 +31,7 @@ class CashDividend implements EntityInterface
         private readonly Stock $stock,
         private readonly Account $account,
         private readonly \DateTime $datetimeutc,
-        private CashDividendMoneyVO $dividendPerShare,
+        private CashDividendPerShareVO $dividendPerShare,
         private CashDividendMoneyVO $expenses
     ) {
         if ($datetimeutc > new \DateTime('now', new \DateTimeZone('UTC'))) {
@@ -125,7 +125,7 @@ class CashDividend implements EntityInterface
         return $this->amount;
     }
 
-    public function getDividendPerShare(): CashDividendMoneyVO
+    public function getDividendPerShare(): CashDividendPerShareVO
     {
         return $this->dividendPerShare;
     }
@@ -175,7 +175,7 @@ class CashDividend implements EntityInterface
 
     public function persistUpdate(
         CashDividendPersistenceInterface $cashDividendPersistence,
-        CashDividendMoneyVO $dividendPerShare,
+        CashDividendPerShareVO $dividendPerShare,
         CashDividendMoneyVO $expenses
     ): self {
         if (false === $dividendPerShare->getCurrency()->sameId($this->account->getCurrency())

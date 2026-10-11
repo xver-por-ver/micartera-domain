@@ -32,6 +32,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountException;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
@@ -78,6 +79,7 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(CashDividendAmountVO::class)]
 #[UsesClass(CashDividendCollection::class)]
 #[UsesClass(CashDividendMoneyVO::class)]
+#[UsesClass(CashDividendPerShareVO::class)]
 #[UsesClass(CashDividendSynchronizer::class)]
 #[UsesClass(Stock::class)]
 #[UsesClass(Movement::class)]
@@ -163,12 +165,12 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         $this->createCommand()->invoke('CABK', $date, '0.30', 'test@example.com');
     }
 
-    public function testRejectsMoneyValuesWithMorePrecisionThanTheAccountCurrency(): void
+    public function testDividendPerShareCanExceedAccountCurrencyPrecision(): void
     {
         self::$loadFixtures = true;
-        $this->expectException(DomainViolationException::class);
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.001', 'test@example.com');
 
-        $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.001', 'test@example.com');
+        self::assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
     }
 
     public function testRejectsCashDividendWhenNoHoldingOnOperationDateDespiteLaterHolding(): void

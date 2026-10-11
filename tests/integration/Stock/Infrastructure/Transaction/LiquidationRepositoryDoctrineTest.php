@@ -102,7 +102,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
         $this->account = $repoAccount->findByIdentifier('test@example.com');
         $this->stock = $repoStock->findById('CABK');
         $this->stock2 = $repoStock->findById('SAN');
-        $this->expenses = new TransactionExpenseVO('11.43', $this->account->getCurrency());
+        $this->expenses = new TransactionExpenseVO(new Number('11.43'), $this->account->getCurrency());
     }
 
     public function testIsCreatedAndRemoved(): void
@@ -114,7 +114,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('99'),
+            new TransactionAmountVO(new Number('99')),
             $this->expenses,
             $this->account
         );
@@ -138,7 +138,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('10'),
+            new TransactionAmountVO(new Number('10')),
             $this->expenses,
             $this->account
         );
@@ -159,7 +159,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('14'),
+            new TransactionAmountVO(new Number('14')),
             $this->expenses,
             $this->account
         );
@@ -194,7 +194,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('654'),
+            new TransactionAmountVO(new Number('654')),
             $this->expenses,
             $this->account
         );
@@ -205,7 +205,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('25 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('200'),
+            new TransactionAmountVO(new Number('200')),
             $this->expenses,
             $this->account
         );
@@ -216,7 +216,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('24 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('400'),
+            new TransactionAmountVO(new Number('400')),
             $this->expenses,
             $this->account
         );
@@ -250,7 +250,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('999'),
+            new TransactionAmountVO(new Number('999')),
             $this->expenses,
             $this->account
         );

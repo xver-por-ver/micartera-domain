@@ -35,13 +35,13 @@ class MoneyVOTest extends TestCase
 
     public function testCanInstantiate(): void
     {
-        $instance = new MoneyVO('0', $this->currency);
+        $instance = new MoneyVO(new Number('0'), $this->currency);
         $this->assertInstanceOf(MoneyVO::class, $instance);
     }
 
     public function testGetCurrency(): void
     {
-        $instance = new MoneyVO('0', $this->currency);
+        $instance = new MoneyVO(new Number('0'), $this->currency);
         $this->assertSame($this->currency, $instance->getCurrency());
     }
 
@@ -50,7 +50,7 @@ class MoneyVOTest extends TestCase
     {
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('numberPrecision');
-        new MoneyVO($result, $this->currency);
+        new MoneyVO(new Number($result), $this->currency);
     }
 
     public static function decimalPlacesProvider(): array
@@ -66,7 +66,7 @@ class MoneyVOTest extends TestCase
     {
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('enterNumberBetween');
-        new MoneyVO($result, $this->currency);
+        new MoneyVO(new Number($result), $this->currency);
     }
 
     public static function numberBetweenProvider(): array
@@ -80,7 +80,7 @@ class MoneyVOTest extends TestCase
     #[DataProvider('formatProvider')]
     public function testFormat(string $testPrice, string $result, string $resultFormatted): void
     {
-        $price = new MoneyVO($testPrice, $this->currency);
+        $price = new MoneyVO(new Number($testPrice), $this->currency);
         $this->assertSame($result, $price->getValue());
         $this->assertSame($resultFormatted, $price->getValueFormatted());
     }
@@ -101,8 +101,8 @@ class MoneyVOTest extends TestCase
     {
         $currency = $this->createStub(Currency::class);
         $currency->method('sameId')->willReturn(true);
-        $m = new MoneyVO('0', $currency);
-        $e = new class ('0', $currency) extends MoneyVO {};
+        $m = new MoneyVO(new Number('0'), $currency);
+        $e = new class (new Number('0'), $currency) extends MoneyVO {};
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('operationRequiresBothOperandsWithSameType');
         $m->{$method}($e);
@@ -113,7 +113,7 @@ class MoneyVOTest extends TestCase
     {
         $currency = $this->createStub(Currency::class);
         $currency->method('sameId')->willReturn(false);
-        $m = new MoneyVO('0', $currency);
+        $m = new MoneyVO(new Number('0'), $currency);
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('operationRequiresBothOperandsWithSameCurrency');
         $m->{$method}($m);
@@ -131,9 +131,9 @@ class MoneyVOTest extends TestCase
     #[DataProvider('operationMethodsReturnsProvider')]
     public function testOperationReturnsStatic(string $method): void
     {
-        $m = new MoneyVO('0', $this->currency);
+        $m = new MoneyVO(new Number('0'), $this->currency);
         $this->assertInstanceOf(MoneyVO::class, $m->{$method}($m));
-        $e = new class ('0', $this->currency) extends MoneyVO {};
+        $e = new class (new Number('0'), $this->currency) extends MoneyVO {};
         $this->assertInstanceOf(get_class($e), $e->{$method}($e));
     }
 
@@ -147,7 +147,7 @@ class MoneyVOTest extends TestCase
 
     public function testPercentageDifferenceReturnedTyped(): void
     {
-        $m = new MoneyVO('0', $this->currency);
+        $m = new MoneyVO(new Number('0'), $this->currency);
         $this->assertInstanceOf(Number::class, $m->percentageDifference($m));
     }
 }

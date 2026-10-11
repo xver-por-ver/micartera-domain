@@ -6,6 +6,7 @@ namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 
 /**
  * @psalm-api
@@ -16,10 +17,7 @@ class TransactionExpenseVO extends MoneyVO
     protected string $valueMin = '0';
     protected string $numberPropertyName = 'expense';
 
-    /**
-     * @psalm-param numeric-string $value
-     */
-    public function __construct(string $value, Currency $currency)
+    public function __construct(Number $value, Currency $currency)
     {
         $this->maxDecimals = $currency->getDecimals();
         parent::__construct($value, $currency);

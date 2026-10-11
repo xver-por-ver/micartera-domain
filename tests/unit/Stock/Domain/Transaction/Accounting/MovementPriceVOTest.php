@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPriceVO;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -29,13 +30,13 @@ class MovementPriceVOTest extends TestCase
 
     public function testCanInstantiate(): void
     {
-        $instance = new MovementPriceVO('0', $this->currency);
+        $instance = new MovementPriceVO(new Number('0'), $this->currency);
         $this->assertInstanceOf(MovementPriceVO::class, $instance);
     }
 
     public function testGetCurrency(): void
     {
-        $instance = new MovementPriceVO('0', $this->currency);
+        $instance = new MovementPriceVO(new Number('0'), $this->currency);
         $this->assertSame($this->currency, $instance->getCurrency());
     }
 
@@ -43,8 +44,8 @@ class MovementPriceVOTest extends TestCase
     public function testDecimalPlaces(string $result): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('numberPrecision');
-        new MovementPriceVO($result, $this->currency);
+        $this->expectExceptionMessageIs('numberPrecision');
+        new MovementPriceVO(new Number($result), $this->currency);
     }
 
     public static function decimalPlacesProvider(): array
@@ -59,8 +60,8 @@ class MovementPriceVOTest extends TestCase
     public function testNumberBetween(string $result): void
     {
         $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessage('enterNumberBetween');
-        new MovementPriceVO($result, $this->currency);
+        $this->expectExceptionMessageIs('enterNumberBetween');
+        new MovementPriceVO(new Number($result), $this->currency);
     }
 
     public static function numberBetweenProvider(): array
@@ -74,7 +75,7 @@ class MovementPriceVOTest extends TestCase
     #[DataProvider('formatProvider')]
     public function testFormat(string $testPrice, string $result, string $resultFormatted): void
     {
-        $price = new MovementPriceVO($testPrice, $this->currency);
+        $price = new MovementPriceVO(new Number($testPrice), $this->currency);
         $this->assertSame($result, $price->getValue());
         $this->assertSame($resultFormatted, $price->getValueFormatted());
     }

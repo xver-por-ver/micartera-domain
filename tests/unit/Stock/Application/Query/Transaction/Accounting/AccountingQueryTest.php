@@ -14,6 +14,7 @@ use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Account\Domain\AccountRepositoryInterface;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting\AccountingDTO;
 use Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting\AccountingQuery;
@@ -72,8 +73,8 @@ class AccountingQueryTest extends TestCase
             $this->createStub(MovementCollection::class)
         );
         $summary = $this->createStub(SummaryVO::class);
-        $summary->method('getAllTimeProfitPrice')->willReturn(new MoneyVO('12', $currency));
-        $summary->method('getDisplayedYearProfitPrice')->willReturn(new MoneyVO('5', $currency));
+        $summary->method('getAllTimeProfitPrice')->willReturn(new MoneyVO(new Number('12'), $currency));
+        $summary->method('getDisplayedYearProfitPrice')->willReturn(new MoneyVO(new Number('5'), $currency));
         $summary->method('getYearFirstLiquidation')->willReturn((int) new \DateTime('now')->format('Y'));
         $this->repoMovement->method('accountingSummaryByAccount')->willReturn($summary);
         $query = new AccountingQuery($this->accountPersistence, $this->movementPersistence, $this->cashDividendPersistence);

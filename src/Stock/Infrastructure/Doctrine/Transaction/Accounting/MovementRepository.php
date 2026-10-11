@@ -112,9 +112,9 @@ class MovementRepository extends EntityRepository implements MovementRepositoryI
 
         $summaryAllTimeDTO = new SummaryDTO(
             new MovementPriceVO($numberOperation->round($account->getCurrency()->getDecimals(), $acquisitionPrice, \RoundingMode::HalfAwayFromZero), $account->getCurrency()),
-            new TransactionExpenseVO($allTimeresult['acquisitionExpenses'], $account->getCurrency()),
+            new TransactionExpenseVO(new Number($allTimeresult['acquisitionExpenses']), $account->getCurrency()),
             new MovementPriceVO($numberOperation->round($account->getCurrency()->getDecimals(), $liquidationPrice, \RoundingMode::HalfAwayFromZero), $account->getCurrency()),
-            new TransactionExpenseVO($allTimeresult['liquidationExpenses'], $account->getCurrency())
+            new TransactionExpenseVO(new Number($allTimeresult['liquidationExpenses']), $account->getCurrency())
         );
 
         $qb = $this->createQueryBuilder('a')
@@ -153,9 +153,9 @@ class MovementRepository extends EntityRepository implements MovementRepositoryI
 
         $summaryDisplayedYearDTO = new SummaryDTO(
             new MovementPriceVO($numberOperation->round($account->getCurrency()->getDecimals(), $acquisitionPrice, \RoundingMode::HalfAwayFromZero), $account->getCurrency()),
-            new TransactionExpenseVO($displayedYearResult['acquisitionExpenses'], $account->getCurrency()),
+            new TransactionExpenseVO(new Number($displayedYearResult['acquisitionExpenses']), $account->getCurrency()),
             new MovementPriceVO($numberOperation->round($account->getCurrency()->getDecimals(), $liquidationPrice, \RoundingMode::HalfAwayFromZero), $account->getCurrency()),
-            new TransactionExpenseVO($displayedYearResult['liquidationExpenses'], $account->getCurrency())
+            new TransactionExpenseVO(new Number($displayedYearResult['liquidationExpenses']), $account->getCurrency())
         );
 
         return new SummaryVO(

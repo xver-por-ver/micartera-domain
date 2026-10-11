@@ -6,6 +6,7 @@ namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
@@ -54,7 +55,7 @@ class Acquisition extends TransactionAbstract
         if (false === $this->sameId($movement->getAcquisition())) {
             throw new \InvalidArgumentException();
         }
-        $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
+        $this->decreaseAmountActionable(new TransactionAmountActionableVO(new Number($movement->getAmount()->getValue())));
         $this->decreaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
         $acquisitionPersistence->persist($this);
 
@@ -68,7 +69,7 @@ class Acquisition extends TransactionAbstract
         if (false === $this->sameId($movement->getAcquisition())) {
             throw new \InvalidArgumentException();
         }
-        $this->increaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
+        $this->increaseAmountActionable(new TransactionAmountActionableVO(new Number($movement->getAmount()->getValue())));
         $this->increaseExpensesUnaccountedFor($movement->getAcquisitionExpenses());
         $acquisitionPersistence->persist($this);
 

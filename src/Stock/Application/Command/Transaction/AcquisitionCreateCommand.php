@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
@@ -29,17 +30,12 @@ class AcquisitionCreateCommand
         private ?CashDividendSynchronizer $cashDividendSynchronizer = null
     ) {}
 
-    /**
-     * @psalm-param numeric-string $amount
-     * @psalm-param numeric-string $priceValue
-     * @psalm-param numeric-string $expensesValue
-     */
     public function invoke(
         string $stockCode,
         \DateTime $datetimeutc,
-        string $amount,
-        string $priceValue,
-        string $expensesValue,
+        Number $amount,
+        Number $priceValue,
+        Number $expensesValue,
         string $accountIdentifier
     ): Acquisition {
         $account = $this->accountPersistence->getRepository()->findByIdentifierOrThrowException($accountIdentifier);

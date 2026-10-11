@@ -12,9 +12,9 @@ use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 final class CashDividendSummaryVO
 {
     private CashDividendMoneyVO $allTimeGross;
-    private CashDividendMoneyVO $allTimeExpenses;
+    private CashDividendMoneyVO $allTimeExpenses; // @TODO this should be MoneyVO
     private CashDividendMoneyVO $displayedYearGross;
-    private CashDividendMoneyVO $displayedYearExpenses;
+    private CashDividendMoneyVO $displayedYearExpenses; // @TODO this should be MoneyVO
     private ?int $yearFirstDividend = null;
     private CashDividendCollection $displayedYearDividends;
 
@@ -24,10 +24,10 @@ final class CashDividendSummaryVO
         private readonly int $displayedYear
     ) {
         $currency = $account->getCurrency();
-        $this->allTimeGross = new CashDividendMoneyVO('0', $currency);
-        $this->allTimeExpenses = new CashDividendMoneyVO('0', $currency);
-        $this->displayedYearGross = new CashDividendMoneyVO('0', $currency);
-        $this->displayedYearExpenses = new CashDividendMoneyVO('0', $currency);
+        $this->allTimeGross = new CashDividendMoneyVO(new Number('0'), $currency);
+        $this->allTimeExpenses = new CashDividendMoneyVO(new Number('0'), $currency);
+        $this->displayedYearGross = new CashDividendMoneyVO(new Number('0'), $currency);
+        $this->displayedYearExpenses = new CashDividendMoneyVO(new Number('0'), $currency);
         /** @var list<CashDividend> $displayedYearDividends */
         $displayedYearDividends = [];
 

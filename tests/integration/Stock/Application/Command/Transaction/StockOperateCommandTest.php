@@ -92,9 +92,9 @@ class StockOperateCommandTest extends IntegrationTestCase
         $acquisition = $command->invoke(
             'CABK',
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            '100',
-            '5.43',
-            '6.57',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('100'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('5.43'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('6.57'),
             'test@example.com'
         );
         $this->assertInstanceOf(Acquisition::class, $acquisition);
@@ -106,9 +106,9 @@ class StockOperateCommandTest extends IntegrationTestCase
         $liquidation = $command->invoke(
             'CABK',
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            '10',
-            '7.55',
-            '4.33',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('10'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('7.55'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('4.33'),
             'test@example.com'
         );
         $this->assertInstanceOf(Liquidation::class, $liquidation);

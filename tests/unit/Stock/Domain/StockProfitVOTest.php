@@ -37,13 +37,13 @@ class StockProfitVOTest extends TestCase
 
     public function testCanInstantiate(): void
     {
-        $instance = new StockProfitVO('0', $this->currency);
+        $instance = new StockProfitVO(new Number('0'), $this->currency);
         $this->assertInstanceOf(StockProfitVO::class, $instance);
     }
 
     public function testGetCurrency(): void
     {
-        $instance = new StockProfitVO('0', $this->currency);
+        $instance = new StockProfitVO(new Number('0'), $this->currency);
         $this->assertSame($this->currency, $instance->getCurrency());
     }
 
@@ -52,7 +52,7 @@ class StockProfitVOTest extends TestCase
     {
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('numberPrecision');
-        new StockProfitVO($value, $this->currency);
+        new StockProfitVO(new Number($value), $this->currency);
     }
 
     public static function decimalPlacesProvider(): array
@@ -68,7 +68,7 @@ class StockProfitVOTest extends TestCase
     {
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessage('enterNumberBetween');
-        new StockProfitVO($result, $this->currency);
+        new StockProfitVO(new Number($result), $this->currency);
     }
 
     public static function numberBetweenProvider(): array
@@ -82,7 +82,7 @@ class StockProfitVOTest extends TestCase
     #[DataProvider('formatProvider')]
     public function testFormat(string $testPrice, string $result, string $resultFormatted): void
     {
-        $price = new StockProfitVO($testPrice, $this->currency);
+        $price = new StockProfitVO(new Number($testPrice), $this->currency);
         $this->assertSame($result, $price->getValue());
         $this->assertSame($resultFormatted, $price->getValueFormatted());
     }

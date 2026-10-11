@@ -99,7 +99,7 @@ class FifoCriteriaTest extends IntegrationTestCase
         $this->account = $repoAccount->findByIdentifierOrThrowException('test@example.com');
         $this->stock = $repoStock->findByIdOrThrowException('CABK');
         $this->stock2 = $repoStock->findByIdOrThrowException('SAN');
-        $this->expenses = new TransactionExpenseVO('4.56', $this->account->getCurrency());
+        $this->expenses = new TransactionExpenseVO(new Number('4.56'), $this->account->getCurrency());
         $this->acquisitionPersistence = new AcquisitionPersistence(self::$registry);
         $this->liquidationPersistence = new LiquidationPersistence(self::$registry);
         $this->movementPersistence = new MovementPersistence(self::$registry);
@@ -116,7 +116,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('last year', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('100'),
+            new TransactionAmountVO(new Number('100')),
             $this->expenses,
             $this->account
         );
@@ -133,7 +133,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('201'),
+            new TransactionAmountVO(new Number('201')),
             $this->expenses,
             $this->account
         );
@@ -149,7 +149,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('1'),
+            new TransactionAmountVO(new Number('1')),
             $this->expenses,
             $this->account
         );
@@ -162,7 +162,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             new \DateTime('40 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('200'),
+            new TransactionAmountVO(new Number('200')),
             $this->expenses,
             $this->account
         );
@@ -186,14 +186,14 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT60M')),
-            new TransactionAmountVO('1000'),
+            new TransactionAmountVO(new Number('1000')),
             $this->expenses,
             $this->account
         );
         $expectedMovements = [];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountVO('1000'),
+            0 => new TransactionAmountVO(new Number('1000')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
@@ -205,16 +205,16 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT30M')),
-            new TransactionAmountVO('500'),
+            new TransactionAmountVO(new Number('500')),
             $this->expenses,
             $this->account
         );
         $expectedMovements = [
-            0 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('500')],
+            0 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('500'))],
         ];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountVO('500'),
+            0 => new TransactionAmountVO(new Number('500')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
@@ -226,18 +226,18 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT90M')),
-            new TransactionAmountVO('200'),
+            new TransactionAmountVO(new Number('200')),
             $this->expenses,
             $this->account
         );
         $expectedMovements = [
-            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('200')],
-            1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('300')],
+            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('200'))],
+            1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('300'))],
         ];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountActionableVO('700'),
-            1 => new TransactionAmountActionableVO('0'),
+            0 => new TransactionAmountActionableVO(new Number('700')),
+            1 => new TransactionAmountActionableVO(new Number('0')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
@@ -249,19 +249,19 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT86M')),
-            new TransactionAmountVO('100'),
+            new TransactionAmountVO(new Number('100')),
             $this->expenses,
             $this->account
         );
         $expectedMovements = [
-            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[1], 'amount' => new TransactionAmountVO('100')],
-            1 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('100')],
-            2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('400')],
+            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[1], 'amount' => new TransactionAmountVO(new Number('100'))],
+            1 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('100'))],
+            2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('400'))],
         ];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountActionableVO('600'),
-            1 => new TransactionAmountActionableVO('0'),
+            0 => new TransactionAmountActionableVO(new Number('600')),
+            1 => new TransactionAmountActionableVO(new Number('0')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
@@ -273,47 +273,47 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT31M')),
-            new TransactionAmountVO('500'),
+            new TransactionAmountVO(new Number('500')),
             $this->expenses,
             $this->account
         );
         $expectedMovements = [
-            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[1], 'amount' => new TransactionAmountVO('100')],
-            1 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('100')],
-            2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('400')],
-            3 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('500')],
+            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[1], 'amount' => new TransactionAmountVO(new Number('100'))],
+            1 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO(new Number('100'))],
+            2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO(new Number('400'))],
+            3 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('500'))],
         ];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountActionableVO('100'),
-            1 => new TransactionAmountActionableVO('0'),
+            0 => new TransactionAmountActionableVO(new Number('100')),
+            1 => new TransactionAmountActionableVO(new Number('0')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
         // Test remove liquidation requiring accounting movements rearrangement
         $liquidations[1]->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $expectedMovements = [
-            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('200')],
-            1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('300')],
-            2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO('500')],
+            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO(new Number('200'))],
+            1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO(new Number('300'))],
+            2 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[0], 'amount' => new TransactionAmountVO(new Number('500'))],
         ];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountActionableVO('200'),
-            1 => new TransactionAmountActionableVO('0'),
+            0 => new TransactionAmountActionableVO(new Number('200')),
+            1 => new TransactionAmountActionableVO(new Number('0')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
         // Test remove other liquidation not requiring accounting movements rearrangement
         $liquidations[0]->persistRemove($this->liquidationPersistence, $this->acquisitionPersistence, $this->movementPersistence);
         $expectedMovements = [
-            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('200')],
-            1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO('300')],
+            0 => ['acquisition' => $acquisitions[1], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO(new Number('200'))],
+            1 => ['acquisition' => $acquisitions[0], 'liquidation' => $liquidations[2], 'amount' => new TransactionAmountVO(new Number('300'))],
         ];
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountActionableVO('700'),
-            1 => new TransactionAmountActionableVO('0'),
+            0 => new TransactionAmountActionableVO(new Number('700')),
+            1 => new TransactionAmountActionableVO(new Number('0')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
@@ -325,15 +325,15 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT20M')),
-            new TransactionAmountVO('200'),
+            new TransactionAmountVO(new Number('200')),
             $this->expenses,
             $this->account
         );
         $this->checkMovements($expectedMovements, $this->retrieveMovements($this->movementPersistence->getRepository()));
         $expectedAmountOutstanding = [
-            0 => new TransactionAmountActionableVO('700'),
-            1 => new TransactionAmountActionableVO('0'),
-            2 => new TransactionAmountActionableVO('200'),
+            0 => new TransactionAmountActionableVO(new Number('700')),
+            1 => new TransactionAmountActionableVO(new Number('0')),
+            2 => new TransactionAmountActionableVO(new Number('200')),
         ];
         $this->checkAcquisitionsAmountOutstanding($acquisitions, $expectedAmountOutstanding);
 
@@ -349,7 +349,7 @@ class FifoCriteriaTest extends IntegrationTestCase
                 $this->stock2,
                 $this->stock2->getPrice(),
                 (clone $acquisitions[1]->getDateTimeUtc())->sub(new \DateInterval('PT30S')),
-                new TransactionAmountVO('1000'),
+                new TransactionAmountVO(new Number('1000')),
                 $this->expenses,
                 $this->account
             );
@@ -369,7 +369,7 @@ class FifoCriteriaTest extends IntegrationTestCase
                 $this->stock2,
                 $this->stock2->getPrice(),
                 (clone $liquidations[2]->getDateTimeUtc())->sub(new \DateInterval('PT30S')),
-                new TransactionAmountVO('1200'),
+                new TransactionAmountVO(new Number('1200')),
                 $this->expenses,
                 $this->account
             );
@@ -398,7 +398,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT50M')),
-            new TransactionAmountVO('1000'),
+            new TransactionAmountVO(new Number('1000')),
             $this->expenses,
             $this->account
         );
@@ -409,7 +409,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT25M')),
-            new TransactionAmountVO('200'),
+            new TransactionAmountVO(new Number('200')),
             $this->expenses,
             $this->account
         );
@@ -422,7 +422,7 @@ class FifoCriteriaTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             (clone $date)->sub(new \DateInterval('PT55M')),
-            new TransactionAmountVO('200'),
+            new TransactionAmountVO(new Number('200')),
             $this->expenses,
             $this->account
         );

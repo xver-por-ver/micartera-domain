@@ -34,10 +34,10 @@ class SummaryDTOTest extends TestCase
     public function testSummaryDTO(): void
     {
         $summaryDTO = new SummaryDTO(
-            new MovementPriceVO('1.00', $this->currency),
-            new TransactionExpenseVO('2.00', $this->currency),
-            new MovementPriceVO('3.00', $this->currency),
-            new TransactionExpenseVO('4.00', $this->currency)
+            new MovementPriceVO(new Number('1.00'), $this->currency),
+            new TransactionExpenseVO(new Number('2.00'), $this->currency),
+            new MovementPriceVO(new Number('3.00'), $this->currency),
+            new TransactionExpenseVO(new Number('4.00'), $this->currency)
         );
         $this->assertSame('1.0000', $summaryDTO->acquisitionsPrice->getValueFormatted());
         $this->assertSame('2.00', $summaryDTO->acquisitionsExpenses->getValueFormatted());

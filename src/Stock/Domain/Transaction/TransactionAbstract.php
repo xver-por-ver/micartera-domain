@@ -8,6 +8,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Uid\Uuid;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
@@ -34,7 +35,7 @@ abstract class TransactionAbstract implements EntityInterface
         $this->validateNoTransactionDateInFuture();
         $this->validateStockAndStockPriceSameCurrency();
         $this->validateStockAndExpensesSameCurrency();
-        $this->amountActionable = new TransactionAmountActionableVO($this->amount->getValue());
+        $this->amountActionable = new TransactionAmountActionableVO(new Number($this->amount->getValue()));
         $this->expensesUnaccountedFor = $this->expenses;
         $this->generateId();
     }
@@ -122,7 +123,7 @@ abstract class TransactionAbstract implements EntityInterface
     public function getPrice(): StockPriceVO
     {
         return new StockPriceVO(
-            $this->price->getValue(),
+            new Number($this->price->getValue()),
             $this->getCurrency()
         );
     }
@@ -130,7 +131,7 @@ abstract class TransactionAbstract implements EntityInterface
     public function getExpenses(): TransactionExpenseVO
     {
         return new TransactionExpenseVO(
-            $this->expenses->getValue(),
+            new Number($this->expenses->getValue()),
             $this->getCurrency()
         );
     }
@@ -185,10 +186,10 @@ abstract class TransactionAbstract implements EntityInterface
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         return isset($this->expensesUnaccountedFor)
             ? new TransactionExpenseVO(
-                $this->expensesUnaccountedFor->getValue(),
+                new Number($this->expensesUnaccountedFor->getValue()),
                 $this->getStock()->getCurrency()
             )
-            : new TransactionExpenseVO('0', $this->getStock()->getCurrency());
+            : new TransactionExpenseVO(new Number('0'), $this->getStock()->getCurrency());
     }
 
     public function getAccount(): Account

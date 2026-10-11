@@ -41,8 +41,8 @@ class SummaryVOTest extends TestCase
             'getDecimals' => 2,
             'sameId' => true,
         ]);
-        $movementPriceVO = new MovementPriceVO('0', $this->currency);
-        $transactionExpenseVO = new TransactionExpenseVO('0', $this->currency);
+        $movementPriceVO = new MovementPriceVO(new Number('0'), $this->currency);
+        $transactionExpenseVO = new TransactionExpenseVO(new Number('0'), $this->currency);
         $this->dto = new SummaryDTO($movementPriceVO, $transactionExpenseVO, $movementPriceVO, $transactionExpenseVO);
 
         $this->tz = new \DateTimeZone('Europe/Madrid');
@@ -69,18 +69,18 @@ class SummaryVOTest extends TestCase
 
     public function testAllTimeAndDisplayedYearMethods(): void
     {
-        $allTimeAcquisitionPrice = new MovementPriceVO('111.1111', $this->currency);
-        $allTimeAcquisitionExpenses = new TransactionExpenseVO('11.11', $this->currency);
-        $allTimeLiquidationPrice = new MovementPriceVO('222.2277', $this->currency);
-        $allTimeLiquidationExpenses = new TransactionExpenseVO('22.22', $this->currency);
-        $allTimeProfitPrice = new MoneyVO('77.78', $this->currency);
+        $allTimeAcquisitionPrice = new MovementPriceVO(new Number('111.1111'), $this->currency);
+        $allTimeAcquisitionExpenses = new TransactionExpenseVO(new Number('11.11'), $this->currency);
+        $allTimeLiquidationPrice = new MovementPriceVO(new Number('222.2277'), $this->currency);
+        $allTimeLiquidationExpenses = new TransactionExpenseVO(new Number('22.22'), $this->currency);
+        $allTimeProfitPrice = new MoneyVO(new Number('77.78'), $this->currency);
         $allTimeProfitPercentage = new Number('53.85');
 
-        $displayedYearAcquisitionPrice = new MovementPriceVO('11.1111', $this->currency);
-        $displayedYearAcquisitionExpenses = new TransactionExpenseVO('1.11', $this->currency);
-        $displayedYearLiquidationPrice = new MovementPriceVO('22.2277', $this->currency);
-        $displayedYearLiquidationExpenses = new TransactionExpenseVO('2.22', $this->currency);
-        $displayedYearProfitPrice = new MoneyVO('7.78', $this->currency);
+        $displayedYearAcquisitionPrice = new MovementPriceVO(new Number('11.1111'), $this->currency);
+        $displayedYearAcquisitionExpenses = new TransactionExpenseVO(new Number('1.11'), $this->currency);
+        $displayedYearLiquidationPrice = new MovementPriceVO(new Number('22.2277'), $this->currency);
+        $displayedYearLiquidationExpenses = new TransactionExpenseVO(new Number('2.22'), $this->currency);
+        $displayedYearProfitPrice = new MoneyVO(new Number('7.78'), $this->currency);
         $displayedYearProfitPercentage = new Number('53.92');
 
         $summaryAllTimeDTO = new SummaryDTO(

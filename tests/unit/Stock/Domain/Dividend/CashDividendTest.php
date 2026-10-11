@@ -75,8 +75,8 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $persistence,
-            new CashDividendPerShareVO('0.5', $currency),
-            new CashDividendMoneyVO('1.25', $currency)
+            new CashDividendPerShareVO(new Number('0.5'), $currency),
+            new CashDividendMoneyVO(new Number('1.25'), $currency)
         );
 
         $this->assertSame('199', $cashDividend->getAmount()->getValue());
@@ -94,8 +94,8 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $this->createStub(CashDividendPersistenceInterface::class),
-            new CashDividendPerShareVO('0.5', $currency),
-            new CashDividendMoneyVO('-1', $currency)
+            new CashDividendPerShareVO(new Number('0.5'), $currency),
+            new CashDividendMoneyVO(new Number('-1'), $currency)
         );
     }
 
@@ -108,8 +108,8 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $this->createStub(CashDividendPersistenceInterface::class),
-            new CashDividendPerShareVO('0', $currency),
-            new CashDividendMoneyVO('0', $currency)
+            new CashDividendPerShareVO(new Number('0'), $currency),
+            new CashDividendMoneyVO(new Number('0'), $currency)
         );
     }
 
@@ -124,8 +124,8 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $this->createStub(CashDividendPersistenceInterface::class),
-            new CashDividendPerShareVO('0.5', $otherCurrency),
-            new CashDividendMoneyVO('0', $cashDividend->getAccount()->getCurrency())
+            new CashDividendPerShareVO(new Number('0.5'), $otherCurrency),
+            new CashDividendMoneyVO(new Number('0'), $cashDividend->getAccount()->getCurrency())
         );
     }
 
@@ -299,8 +299,8 @@ class CashDividendTest extends TestCase
             $stock,
             $account,
             $date ?? new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new CashDividendPerShareVO($dividendPerShare, $dividendPerShareCurrencyMatches ? $currency : $otherCurrency),
-            new CashDividendMoneyVO($expenses, $expensesCurrencyMatches ? $currency : $otherCurrency)
+            new CashDividendPerShareVO(new Number($dividendPerShare), $dividendPerShareCurrencyMatches ? $currency : $otherCurrency),
+            new CashDividendMoneyVO(new Number($expenses), $expensesCurrencyMatches ? $currency : $otherCurrency)
         );
     }
 }

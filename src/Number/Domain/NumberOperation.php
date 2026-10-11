@@ -6,50 +6,32 @@ namespace Xver\MiCartera\Domain\Number\Domain;
 
 final class NumberOperation
 {
-    /**
-     * @psalm-return numeric-string
-     */
-    public function add(int $decimals, NumberInterface $operand1, NumberInterface $operand2): string
+    public function add(int $decimals, NumberInterface $operand1, NumberInterface $operand2): Number
     {
-        return bcadd($operand1->getValue(), $operand2->getValue(), $decimals);
+        return new Number(bcadd($operand1->getValue(), $operand2->getValue(), $decimals));
     }
 
-    /**
-     * @psalm-return numeric-string
-     */
-    public function subtract(int $decimals, NumberInterface $operand1, NumberInterface $operand2): string
+    public function subtract(int $decimals, NumberInterface $operand1, NumberInterface $operand2): Number
     {
-        return bcsub($operand1->getValue(), $operand2->getValue(), $decimals);
+        return new Number(bcsub($operand1->getValue(), $operand2->getValue(), $decimals));
     }
 
-    /**
-     * @psalm-return numeric-string
-     *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     */
-    public function multiply(int $decimals, NumberInterface $operand1, NumberInterface $operand2, \RoundingMode $roundingMode = \RoundingMode::HalfAwayFromZero): string
+    public function multiply(int $decimals, NumberInterface $operand1, NumberInterface $operand2, \RoundingMode $roundingMode = \RoundingMode::HalfAwayFromZero): Number
     {
-        return bcround(
+        return new Number(bcround(
             bcmul($operand1->getValue(), $operand2->getValue(), $decimals + 1),
             $decimals,
             $roundingMode
-        );
+        ));
     }
 
-    /**
-     * @psalm-return numeric-string
-     *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     */
-    public function divide(int $decimals, NumberInterface $dividend, NumberInterface $divisor, \RoundingMode $roundingMode = \RoundingMode::HalfAwayFromZero): string
+    public function divide(int $decimals, NumberInterface $dividend, NumberInterface $divisor, \RoundingMode $roundingMode = \RoundingMode::HalfAwayFromZero): Number
     {
-        return bcround(
+        return new Number(bcround(
             bcdiv($dividend->getValue(), $divisor->getValue(), $decimals + 1),
             $decimals,
             $roundingMode
-        );
+        ));
     }
 
     private function compare(int $decimals, NumberInterface $operand1, NumberInterface $operand2): int
@@ -91,76 +73,42 @@ final class NumberOperation
         return 0 !== $this->compare($decimals, $operand1, $operand2);
     }
 
-    /**
-     * @psalm-return numeric-string
-     */
     public function percentageDifference(
         int $operandsDecimals,
         int $outputDecimals,
         NumberInterface $operand1,
         NumberInterface $operand2
-    ): string {
+    ): Number {
         $result = null;
 
         if ($this->same($operandsDecimals, new Number('0'), $operand1) && $this->same($operandsDecimals, new Number('0'), $operand2)) {
             $result = $this->round(
                 $outputDecimals,
-                new Number('0'),
-                \RoundingMode::HalfAwayFromZero
+                new Number('0')
             );
         } elseif ($this->different($operandsDecimals, new Number('0'), $operand1) && $this->same($operandsDecimals, new Number('0'), $operand2)) {
             $result = $this->round(
                 $outputDecimals,
-                new Number('-100'),
-                \RoundingMode::HalfAwayFromZero
+                new Number('-100')
             );
         } elseif ($this->same($operandsDecimals, new Number('0'), $operand1) && $this->different($operandsDecimals, new Number('0'), $operand2)) {
             $result = $this->round(
                 $outputDecimals,
-                new Number('100'),
-                \RoundingMode::HalfAwayFromZero
+                new Number('100')
             );
         } else {
-            $divResult = new Number(
-                $this->divide(
-                    $operandsDecimals + 3,
-                    new Number(
-                        $this->subtract(
-                            $operandsDecimals + 3,
-                            $operand2,
-                            $operand1
-                        )
-                    ),
-                    $operand1
-                )
-            );
 
-            $mulResult = new Number(
-                $this->multiply(
-                    $operandsDecimals + 3,
-                    $divResult,
-                    new Number('100')
-                )
-            );
-
-            $result = $this->round(
-                $outputDecimals,
-                $mulResult,
-                \RoundingMode::HalfAwayFromZero
-            );
+            $difference = $this->subtract($operandsDecimals + 3, $operand2, $operand1);
+            $divResult = $this->divide($operandsDecimals + 3, $difference, $operand1);
+            $mulResult = $this->multiply($operandsDecimals + 3, $divResult, new Number('100'));
+            $result = $this->round($outputDecimals, $mulResult);
         }
 
         return $result;
     }
 
-    /**
-     * @psalm-return numeric-string
-     *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     */
-    public function round(int $decimals, NumberInterface $number, \RoundingMode $mode = \RoundingMode::HalfAwayFromZero): string
+    public function round(int $decimals, NumberInterface $number, \RoundingMode $mode = \RoundingMode::HalfAwayFromZero): Number
     {
-        return bcround($number->getValue(), $decimals, $mode);
+        return new Number(bcround($number->getValue(), $decimals, $mode));
     }
 }

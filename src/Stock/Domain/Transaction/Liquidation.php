@@ -7,6 +7,7 @@ namespace Xver\MiCartera\Domain\Stock\Domain\Transaction;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
@@ -71,7 +72,7 @@ class Liquidation extends TransactionAbstract
             parent::increaseExpensesUnaccountedFor($movement->getLiquidationExpenses());
         }
         $this->movementCollection->clear();
-        $this->amountActionable = new TransactionAmountActionableVO($this->amount->getValue());
+        $this->amountActionable = new TransactionAmountActionableVO(new Number($this->amount->getValue()));
         $liquidationPersistence->persist($this);
 
         return $updatedAcquisitionsCollection;
@@ -85,7 +86,7 @@ class Liquidation extends TransactionAbstract
             throw new \InvalidArgumentException();
         }
         $this->decreaseExpensesUnaccountedFor($movement->getLiquidationExpenses());
-        $this->decreaseAmountActionable(new TransactionAmountActionableVO($movement->getAmount()->getValue()));
+        $this->decreaseAmountActionable(new TransactionAmountActionableVO(new Number($movement->getAmount()->getValue())));
         $this->movementCollection->add($movement);
         $liquidationPersistence->persist($this);
 

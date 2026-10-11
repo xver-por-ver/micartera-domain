@@ -7,6 +7,7 @@ namespace Xver\MiCartera\Domain\Stock\Domain;
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Exchange\Domain\Exchange;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\PhpAppCoreBundle\Entity\Domain\EntityInterface;
 use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 
@@ -118,7 +119,7 @@ class Stock implements EntityInterface
 
     public function getPrice(): StockPriceVO
     {
-        return new StockPriceVO($this->price->getValue(), $this->getCurrency());
+        return new StockPriceVO(new Number($this->price->getValue()), $this->getCurrency());
     }
 
     public function getExchange(): Exchange

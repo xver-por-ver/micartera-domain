@@ -25,11 +25,11 @@ class Number implements NumberInterface
     protected string $valueMax = self::VALUE_MAX;
     protected int $maxDecimals = self::DECIMALS_MAX;
 
-    /**
-     * @psalm-param numeric-string $value
-     */
-    public function __construct(protected string $value = '0')
+    protected string $value;
+
+    public function __construct(string $value = '0')
     {
+        $this->value = $value;
         $this->assertValidValue();
     }
 
@@ -152,10 +152,6 @@ class Number implements NumberInterface
         }
     }
 
-    /**
-     * @psalm-param numeric-string $min
-     * @psalm-param numeric-string $max
-     */
     protected function assertValueWithinLimits(): void
     {
         if (

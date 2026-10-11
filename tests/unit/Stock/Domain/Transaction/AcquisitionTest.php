@@ -61,7 +61,7 @@ class AcquisitionTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$dateTimeUtc = new \DateTime('yesterday', new \DateTimeZone('UTC'));
-        self::$amount = new TransactionAmountVO('100');
+        self::$amount = new TransactionAmountVO(new Number('100'));
     }
 
     public function setUp(): void
@@ -81,8 +81,8 @@ class AcquisitionTest extends TestCase
         $this->currency->method('getDecimals')->willReturn(2);
         $this->currency->method('getIso3')->willReturn('EUR');
         $this->account = $this->createStub(Account::class);
-        $this->price = new StockPriceVO('4.5600', $this->currency);
-        $this->expenses = new TransactionExpenseVO('23.34', $this->currency);
+        $this->price = new StockPriceVO(new Number('4.5600'), $this->currency);
+        $this->expenses = new TransactionExpenseVO(new Number('23.34'), $this->currency);
         $this->stock = $this->createStub(Stock::class);
         $this->stock->method('getCurrency')->willReturn($this->currency);
         $this->stock->method('getPrice')->willReturn($this->price);
@@ -165,7 +165,7 @@ class AcquisitionTest extends TestCase
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('enterNumberBetween');
         $this->getMockBuilder(Acquisition::class)->enableOriginalConstructor()->setConstructorArgs(
-            [$this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, new TransactionAmountVO($transAmount), $this->expenses, $this->account]
+            [$this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, new TransactionAmountVO(new Number($transAmount)), $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
     }
 
@@ -214,8 +214,8 @@ class AcquisitionTest extends TestCase
     {
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('MovementAmountNotWithinAllowedLimits');
-        $amount = new TransactionAmountVO('10');
-        $amountInvalid = new TransactionAmountVO('12');
+        $amount = new TransactionAmountVO(new Number('10'));
+        $amountInvalid = new TransactionAmountVO(new Number('12'));
         $transaction = $this->getMockBuilder(Acquisition::class)->enableOriginalConstructor()->setConstructorArgs(
             [$this->acquisitionPersistence, $this->liquidationPersistence, $this->movementPersistence, $this->stock, $this->stock->getPrice(), self::$dateTimeUtc, $amount, $this->expenses, $this->account]
         )->onlyMethods(['fiFoCriteriaInstance'])->getMock();
@@ -237,7 +237,7 @@ class AcquisitionTest extends TestCase
         $movement = $this->createStub(Movement::class);
         $movement->method('getAcquisition')->willReturn($transaction);
         $movement->method('getAmount')->willReturn(self::$amount);
-        $invalidExpenses = $this->expenses->add(new TransactionExpenseVO('1', $this->currency));
+        $invalidExpenses = $this->expenses->add(new TransactionExpenseVO(new Number('1'), $this->currency));
         $movement->method('getAcquisitionExpenses')->willReturn($invalidExpenses);
         $transaction->unaccountMovement($this->acquisitionPersistence, $movement);
     }
@@ -264,7 +264,7 @@ class AcquisitionTest extends TestCase
         $movement->expects($this->exactly(2))->method('getAcquisitionExpenses')->willReturn($this->expenses);
         $this->assertSame($transaction, $transaction->accountMovement($this->acquisitionPersistence, $movement));
         $this->assertSame('0', $transaction->getAmountActionable()->getValue());
-        $this->assertEquals(new TransactionExpenseVO('0.00', $this->currency), $transaction->getExpensesUnaccountedFor());
+        $this->assertEquals(new TransactionExpenseVO(new Number('0.00'), $this->currency), $transaction->getExpensesUnaccountedFor());
         $transaction->unaccountMovement($this->acquisitionPersistence, $movement);
         $this->assertSame(self::$amount->getValue(), $transaction->getAmountActionable()->getValue());
         $this->assertEquals($this->expenses, $transaction->getExpensesUnaccountedFor());
@@ -277,8 +277,8 @@ class AcquisitionTest extends TestCase
         )->onlyMethods(['fiFoCriteriaInstance', 'sameId'])->getMock();
         $transaction->expects($this->once())->method('sameId')->willReturn(true);
         $movement = $this->createMock(Movement::class);
-        $movement->expects($this->once())->method('getAmount')->willReturn(new TransactionAmountVO('14'));
-        $movement->expects($this->once())->method('getAcquisitionExpenses')->willReturn($this->expenses->add(new TransactionExpenseVO('1', $this->currency)));
+        $movement->expects($this->once())->method('getAmount')->willReturn(new TransactionAmountVO(new Number('14')));
+        $movement->expects($this->once())->method('getAcquisitionExpenses')->willReturn($this->expenses->add(new TransactionExpenseVO(new Number('1'), $this->currency)));
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('InvalidMovementExpensesAmount');
         $transaction->accountMovement($this->acquisitionPersistence, $movement);
@@ -292,7 +292,7 @@ class AcquisitionTest extends TestCase
         $transaction->expects($this->once())->method('sameId')->willReturn(true);
         $movement = $this->createMock(Movement::class);
         $movement->expects($this->once())->method('getAmount')->willReturn(
-            new TransactionAmountVO(bcadd(self::$amount->getValue(), '1'))
+            new TransactionAmountVO(new Number(bcadd(self::$amount->getValue(), '1')))
         );
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('MovementAmountNotWithinAllowedLimits');

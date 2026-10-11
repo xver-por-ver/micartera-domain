@@ -13,6 +13,7 @@ use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Currency\Infrastructure\Doctrine\CurrencyRepository;
 use Xver\MiCartera\Domain\Exchange\Domain\Exchange;
 use Xver\MiCartera\Domain\Exchange\Infrastructure\Doctrine\ExchangeRepository;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
@@ -86,8 +87,8 @@ class LazynessTest extends IntegrationTestCase
             $this->acquisition->getStock(),
             $this->acquisition->getAccount(),
             $this->acquisition->getDateTimeUtc(),
-            new CashDividendPerShareVO('0.25', $this->acquisition->getAccount()->getCurrency()),
-            new CashDividendMoneyVO('0', $this->acquisition->getAccount()->getCurrency())
+            new CashDividendPerShareVO(new Number('0.25'), $this->acquisition->getAccount()->getCurrency()),
+            new CashDividendMoneyVO(new Number('0'), $this->acquisition->getAccount()->getCurrency())
         );
         $instance = new CashDividendRepository(self::$registry);
         $this->invokeMethod($instance, 'findById', Uuid::v4());

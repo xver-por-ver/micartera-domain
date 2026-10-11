@@ -18,11 +18,8 @@ class TransactionAmountActionableVO extends Number
     protected string $valueMax = '999999999.999999999';
     protected int $maxDecimals = 9;
 
-    /**
-     * @psalm-param numeric-string $value
-     */
-    public function __construct(string $value)
+    public function __construct(Number $value)
     {
-        parent::__construct($value);
+        parent::__construct($value->getValue());
     }
 }

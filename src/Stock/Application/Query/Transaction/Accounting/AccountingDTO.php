@@ -165,21 +165,17 @@ final class AccountingDTO extends EntityCollectionQueryResponse
 
         $totalMovementInvestment = $this->calculateTotalMovementInvestment($offset, $numberOperation);
 
-        $profitPercentage = new Number(
-            $numberOperation->percentageDifference(
-                $totalMovementInvestment->getMaxDecimals(),
-                2,
-                $totalMovementInvestment,
-                $this->getMovementLiquidationPrice($offset)
-            )
+        $profitPercentage = $numberOperation->percentageDifference(
+            $totalMovementInvestment->getMaxDecimals(),
+            2,
+            $totalMovementInvestment,
+            $this->getMovementLiquidationPrice($offset)
         );
 
-        return new Number(
-            $numberOperation->round(
-                2,
-                $profitPercentage,
-                \RoundingMode::HalfAwayFromZero
-            )
+        return $numberOperation->round(
+            2,
+            $profitPercentage,
+            \RoundingMode::HalfAwayFromZero
         );
     }
 

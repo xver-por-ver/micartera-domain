@@ -17,15 +17,12 @@ class MoneyVO extends Number
 {
     protected string $numberPropertyName = 'money';
 
-    /**
-     * @psalm-param numeric-string $value
-     */
-    public function __construct(string $value, private readonly Currency $currency)
+    public function __construct(Number $value, private readonly Currency $currency)
     {
         if (MoneyVO::class === get_class($this)) {
             $this->maxDecimals = $this->currency->getDecimals();
         }
-        parent::__construct($value);
+        parent::__construct($value->getValue());
     }
 
     public function getCurrency(): Currency
@@ -71,13 +68,11 @@ class MoneyVO extends Number
 
         $numberOperation = new NumberOperation();
 
-        return new Number(
-            $numberOperation->percentageDifference(
-                $this->getMaxDecimals(),
-                $decimals,
-                $this,
-                $aux
-            )
+        return $numberOperation->percentageDifference(
+            $this->getMaxDecimals(),
+            $decimals,
+            $this,
+            $aux
         );
     }
 

@@ -196,8 +196,8 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->account,
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new CashDividendPerShareVO('145', $this->account->getCurrency()),
-            new CashDividendMoneyVO('3', $this->account->getCurrency())
+            new CashDividendPerShareVO(new Number('145'), $this->account->getCurrency()),
+            new CashDividendMoneyVO(new Number('3'), $this->account->getCurrency())
         );
         $cashDividendId = $cashDividend->getId();
         parent::detachEntity($cashDividendId);
@@ -215,8 +215,8 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->account,
             $date,
-            new CashDividendPerShareVO($dividendPerShare, $this->account->getCurrency()),
-            new CashDividendMoneyVO('3', $this->account->getCurrency())
+            new CashDividendPerShareVO(new Number($dividendPerShare), $this->account->getCurrency()),
+            new CashDividendMoneyVO(new Number('3'), $this->account->getCurrency())
         );
     }
 }

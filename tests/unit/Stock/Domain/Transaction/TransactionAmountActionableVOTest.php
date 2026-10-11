@@ -30,7 +30,7 @@ class TransactionAmountActionableVOTest extends TestCase
         } else {
             $this->expectNotToPerformAssertions();
         }
-        new TransactionAmountActionableVO($amount);
+        new TransactionAmountActionableVO(new Number($amount));
     }
 
     public static function valuesToTest(): array

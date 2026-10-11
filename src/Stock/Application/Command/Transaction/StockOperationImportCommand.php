@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xver\MiCartera\Domain\Stock\Application\Command\Transaction;
 
 use Symfony\Component\Translation\TranslatableMessage;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
@@ -53,9 +54,9 @@ class StockOperationImportCommand
             $command->invoke(
                 $line[2],
                 $dateTime,
-                $line[4],
-                $line[3],
-                $line[5],
+                new Number($line[4]),
+                new Number($line[3]),
+                new Number($line[5]),
                 $accountIdentifier
             );
         } catch (EntityNotFoundException $e) {

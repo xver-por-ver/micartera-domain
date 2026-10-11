@@ -101,13 +101,13 @@ class StockRepositoryDoctrineTest extends IntegrationTestCase
 
     public function testStockIsAddedUpdatedAndRemoved(): void
     {
-        $stock = new Stock($this->stockPersistence, 'ABCD', 'ABCD Name', new StockPriceVO('2.6632', $this->currencyEuro), $this->exchange);
+        $stock = new Stock($this->stockPersistence, 'ABCD', 'ABCD Name', new StockPriceVO(new Number('2.6632'), $this->currencyEuro), $this->exchange);
         $this->assertInstanceOf(Stock::class, $stock);
         parent::detachEntity($stock);
         $stock = $this->stockPersistence->getRepository()->findById($stock->getId());
         $this->assertInstanceOf(Stock::class, $stock);
         $newName = 'ABCD Name New';
-        $newPrice = new StockPriceVO('2.7400', $stock->getCurrency());
+        $newPrice = new StockPriceVO(new Number('2.7400'), $stock->getCurrency());
         $stock->persistUpdate($this->stockPersistence, $newName, $newPrice);
         parent::detachEntity($stock);
         $stock = $this->stockPersistence->getRepository()->findById($stock->getId());
@@ -143,9 +143,9 @@ class StockRepositoryDoctrineTest extends IntegrationTestCase
     {
         parent::$loadFixtures = true;
         $expected = [
-            new Stock($this->stockPersistence, 'EFGH', 'EFGGH Name', new StockPriceVO('4.2300', $this->currencyDollar), $this->exchange),
-            new Stock($this->stockPersistence, 'IJKL', 'IJKL Name', new StockPriceVO('5.2300', $this->currencyDollar), $this->exchange),
-            new Stock($this->stockPersistence, 'MNOP', 'MNOP Name', new StockPriceVO('4.2301', $this->currencyDollar), $this->exchange),
+            new Stock($this->stockPersistence, 'EFGH', 'EFGGH Name', new StockPriceVO(new Number('4.2300'), $this->currencyDollar), $this->exchange),
+            new Stock($this->stockPersistence, 'IJKL', 'IJKL Name', new StockPriceVO(new Number('5.2300'), $this->currencyDollar), $this->exchange),
+            new Stock($this->stockPersistence, 'MNOP', 'MNOP Name', new StockPriceVO(new Number('4.2301'), $this->currencyDollar), $this->exchange),
         ];
         $amount = count($expected);
         $stocks = $this->stockPersistence->getRepository()->findByCurrency($this->currencyDollar, 10, 0, 'code', 'ASC');
@@ -178,9 +178,9 @@ class StockRepositoryDoctrineTest extends IntegrationTestCase
     {
         parent::$loadFixtures = true;
         $expected = [
-            new Stock($this->stockPersistence, 'EFGH', 'EFGGH Name', new StockPriceVO('4.2300', $this->currencyDollar), $this->exchange),
-            new Stock($this->stockPersistence, 'IJKL', 'IJKL Name', new StockPriceVO('5.2300', $this->currencyDollar), $this->exchange),
-            new Stock($this->stockPersistence, 'MNOP', 'MNOP Name', new StockPriceVO('4.2301', $this->currencyDollar), $this->exchange),
+            new Stock($this->stockPersistence, 'EFGH', 'EFGGH Name', new StockPriceVO(new Number('4.2300'), $this->currencyDollar), $this->exchange),
+            new Stock($this->stockPersistence, 'IJKL', 'IJKL Name', new StockPriceVO(new Number('5.2300'), $this->currencyDollar), $this->exchange),
+            new Stock($this->stockPersistence, 'MNOP', 'MNOP Name', new StockPriceVO(new Number('4.2301'), $this->currencyDollar), $this->exchange),
         ];
         $amount = count($expected);
         $amountDb = $this->stockPersistence->getRepository()->countByCurrency($this->currencyDollar);

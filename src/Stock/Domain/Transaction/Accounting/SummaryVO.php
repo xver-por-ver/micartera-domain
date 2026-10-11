@@ -143,14 +143,14 @@ class SummaryVO
     private function calculateInvestments(): void
     {
         $allTimeExpensesAsMovementPrice = new MovementPriceVO(
-            $this->getAllTimeAcquisitionsExpenses()->add($this->getAllTimeLiquidationsExpenses())->getValue(),
+            new Number($this->getAllTimeAcquisitionsExpenses()->add($this->getAllTimeLiquidationsExpenses())->getValue()),
             $this->account->getCurrency()
         );
 
         $this->allTimeInvestment = $this->getAllTimeAcquisitionsPrice()->add($allTimeExpensesAsMovementPrice);
 
         $displayeyYearExpensesAsMovementPrice = new MovementPriceVO(
-            $this->getDisplayedYearAcquisitionsExpenses()->add($this->getDisplayedYearLiquidationsExpenses())->getValue(),
+            new Number($this->getDisplayedYearAcquisitionsExpenses()->add($this->getDisplayedYearLiquidationsExpenses())->getValue()),
             $this->account->getCurrency()
         );
 

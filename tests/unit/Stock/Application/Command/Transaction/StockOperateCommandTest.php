@@ -110,9 +110,9 @@ class StockOperateCommandTest extends TestCase
         $command->invoke(
             'TEST',
             new \DateTime('now', new \DateTimeZone('UTC')),
-            '100',
-            '6.5443',
-            '5.34',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('100'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('6.5443'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('5.34'),
             'test@example.com'
         );
     }
@@ -136,9 +136,9 @@ class StockOperateCommandTest extends TestCase
         $liquidation = $command->invoke(
             'TEST',
             new \DateTime('now', new \DateTimeZone('UTC')),
-            '100',
-            '6.5443',
-            '5.34',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('100'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('6.5443'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('5.34'),
             'test@example.com'
         );
         $this->assertInstanceOf(Liquidation::class, $liquidation);

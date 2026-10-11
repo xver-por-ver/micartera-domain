@@ -40,9 +40,9 @@ class SummaryVOTest extends TestCase
 
     public function testGettersReturnExpectedValues(): void
     {
-        $acqPrice = new MovementPriceVO('100.00', $this->currency);
-        $acqExp = new TransactionExpenseVO('10.00', $this->currency);
-        $marketPrice = new MovementPriceVO('150.00', $this->currency);
+        $acqPrice = new MovementPriceVO(new Number('100.00'), $this->currency);
+        $acqExp = new TransactionExpenseVO(new Number('10.00'), $this->currency);
+        $marketPrice = new MovementPriceVO(new Number('150.00'), $this->currency);
         $vo = new SummaryVO($acqPrice, $acqExp, $marketPrice, $this->currency);
 
         $this->assertSame($acqPrice, $vo->getTotalAcquisitionsPrice());
@@ -53,9 +53,9 @@ class SummaryVOTest extends TestCase
 
     public function testTotalProfitForecastPriceAndPercentage(): void
     {
-        $acqPrice = new MovementPriceVO('100.00', $this->currency);
-        $acqExp = new TransactionExpenseVO('10.00', $this->currency);
-        $marketPrice = new MovementPriceVO('150.00', $this->currency);
+        $acqPrice = new MovementPriceVO(new Number('100.00'), $this->currency);
+        $acqExp = new TransactionExpenseVO(new Number('10.00'), $this->currency);
+        $marketPrice = new MovementPriceVO(new Number('150.00'), $this->currency);
         $vo = new SummaryVO($acqPrice, $acqExp, $marketPrice, $this->currency);
 
         $profit = $vo->getTotalProfitForecastPrice();
@@ -69,9 +69,9 @@ class SummaryVOTest extends TestCase
 
     public function testZeroProfit(): void
     {
-        $acqPrice = new MovementPriceVO('100.00', $this->currency);
-        $acqExp = new TransactionExpenseVO('0.00', $this->currency);
-        $marketPrice = new MovementPriceVO('100.00', $this->currency);
+        $acqPrice = new MovementPriceVO(new Number('100.00'), $this->currency);
+        $acqExp = new TransactionExpenseVO(new Number('0.00'), $this->currency);
+        $marketPrice = new MovementPriceVO(new Number('100.00'), $this->currency);
         $vo = new SummaryVO($acqPrice, $acqExp, $marketPrice, $this->currency);
         $profit = $vo->getTotalProfitForecastPrice();
         $this->assertEquals('0', $profit->getValue());

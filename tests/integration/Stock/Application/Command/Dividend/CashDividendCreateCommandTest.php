@@ -106,7 +106,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     public function testCreatesCashDividendUsingHoldingAtOperationDateAndDefaultsExpensesToZero(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.25', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
 
         $this->assertInstanceOf(CashDividend::class, $cashDividend);
         $this->assertSame('200', $cashDividend->getAmount()->getValue());
@@ -125,10 +125,10 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     public function testUpdatesDividendPerShareAndExpensesAndRecalculatesGrossPayment(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.25', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
 
         $updated = new CashDividendUpdateCommand(new CashDividendPersistence(self::$registry))
-            ->invoke($cashDividend->getId()->toString(), '0.40', '1.20');
+            ->invoke($cashDividend->getId()->toString(), new \Xver\MiCartera\Domain\Number\Domain\Number('0.40'), new \Xver\MiCartera\Domain\Number\Domain\Number('1.20'));
 
         $this->assertSame('0.4', $updated->getDividendPerShare()->getValue());
         $this->assertSame('1.2', $updated->getExpenses()->getValue());
@@ -138,7 +138,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     public function testDeletesCashDividendById(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.25', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
 
         new CashDividendDeleteCommand(new CashDividendPersistence(self::$registry))
             ->invoke($cashDividend->getId()->toString());
@@ -149,7 +149,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     public function testRecordsExpensesSeparatelyFromGrossDividendPayment(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.25', 'test@example.com', '1.50');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com', new \Xver\MiCartera\Domain\Number\Domain\Number('1.50'));
 
         $this->assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
         $this->assertSame('1.5', $cashDividend->getExpenses()->getValue());
@@ -159,16 +159,16 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     {
         self::$loadFixtures = true;
         $date = $this->dateAtSecond(0);
-        $this->createCommand()->invoke('CABK', $date, '0.25', 'test@example.com');
+        $this->createCommand()->invoke('CABK', $date, new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
 
         $this->expectException(DomainViolationException::class);
-        $this->createCommand()->invoke('CABK', $date, '0.30', 'test@example.com');
+        $this->createCommand()->invoke('CABK', $date, new \Xver\MiCartera\Domain\Number\Domain\Number('0.30'), 'test@example.com');
     }
 
     public function testDividendPerShareCanExceedAccountCurrencyPrecision(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.001', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), new \Xver\MiCartera\Domain\Number\Domain\Number('0.001'), 'test@example.com');
 
         $this->assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
     }
@@ -179,22 +179,22 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         $this->expectException(CashDividendAmountException::class);
 
         $date = new \DateTime('first day of january last year', new \DateTimeZone('UTC'));
-        $this->createCommand()->invoke('CABK', $date, '0.25', 'test@example.com');
+        $this->createCommand()->invoke('CABK', $date, new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
     }
 
     public function testAcquisitionChangesRecalculateAffectedDividendSharesAndGrossPayment(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(5), '0.25', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(5), new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
         $this->assertNotNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
         $this->assertCount(1, new CashDividendPersistence(self::$registry)->getRepository()->findByAccountStockAtOrAfter($cashDividend->getAccount(), $cashDividend->getStock(), $this->dateAtSecond(2)));
 
         $this->createAcquisitionCommand()->invoke(
             'CABK',
             $this->dateAtSecond(2),
-            '5',
-            '2.5',
-            '0',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('5'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('2.5'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('0'),
             'test@example.com'
         );
 
@@ -206,14 +206,14 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     public function testLiquidationThatRemovesEntirePositionDeletesAffectedDividend(): void
     {
         self::$loadFixtures = true;
-        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(5), '0.25', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(5), new \Xver\MiCartera\Domain\Number\Domain\Number('0.25'), 'test@example.com');
 
         $this->createLiquidationCommand()->invoke(
             'CABK',
             $this->dateAtSecond(2),
-            '199',
-            '2.5',
-            '0',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('199'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('2.5'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('0'),
             'test@example.com'
         );
 
@@ -227,12 +227,12 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         $acquisition = $this->createAcquisitionCommand()->invoke(
             'SAN',
             $date,
-            '10',
-            '3',
-            '0',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('10'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('3'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('0'),
             'test@example.com'
         );
-        $cashDividend = $this->createCommand()->invoke('SAN', $this->dateAtSecond(3600), '0.5', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('SAN', $this->dateAtSecond(3600), new \Xver\MiCartera\Domain\Number\Domain\Number('0.5'), 'test@example.com');
 
         new AcquisitionDeleteCommand($this->acquisitionPersistence(), $this->cashDividendSynchronizer())
             ->invoke($acquisition->getId()->toString());
@@ -241,9 +241,9 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         $replacement = $this->createAcquisitionCommand()->invoke(
             'SAN',
             $date,
-            '12',
-            '3',
-            '0',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('12'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('3'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('0'),
             'test@example.com'
         );
         $this->assertSame('12', $replacement->getAmount()->getValue());
@@ -256,12 +256,12 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         $acquisition = $this->createAcquisitionCommand()->invoke(
             'SAN',
             $this->dateAtSecond(0),
-            '10',
-            '3',
-            '0',
+            new \Xver\MiCartera\Domain\Number\Domain\Number('10'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('3'),
+            new \Xver\MiCartera\Domain\Number\Domain\Number('0'),
             'test@example.com'
         );
-        $cashDividend = $this->createCommand()->invoke('SAN', $this->dateAtSecond(3600), '0.5', 'test@example.com');
+        $cashDividend = $this->createCommand()->invoke('SAN', $this->dateAtSecond(3600), new \Xver\MiCartera\Domain\Number\Domain\Number('0.5'), 'test@example.com');
 
         new AcquisitionDeleteCommand($this->acquisitionPersistence(), $this->cashDividendSynchronizer())
             ->invoke($acquisition->getId()->toString());

@@ -110,12 +110,12 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
         $this->stock = $repoStock->findById('CABK');
         $this->stock2 = $repoStock->findById('SAN');
         $this->stock3 = $repoStock->findById('ROVI');
-        $this->expenses = new TransactionExpenseVO('11.43', $this->account->getCurrency());
+        $this->expenses = new TransactionExpenseVO(new Number('11.43'), $this->account->getCurrency());
     }
 
     public function testIsCreatedAndRemoved(): void
     {
-        $amount = new TransactionAmountVO('399');
+        $amount = new TransactionAmountVO(new Number('399'));
         $transaction = new Acquisition(
             $this->acquisitionPersistence,
             $this->liquidationPersistence,
@@ -150,7 +150,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('654'),
+            new TransactionAmountVO(new Number('654')),
             $this->expenses,
             $this->account
         );
@@ -175,7 +175,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('30 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('654'),
+            new TransactionAmountVO(new Number('654')),
             $this->expenses,
             $this->account
         );
@@ -210,7 +210,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('2 hours ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('654'),
+            new TransactionAmountVO(new Number('654')),
             $this->expenses,
             $this->account
         );
@@ -221,7 +221,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('1 hour ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('654'),
+            new TransactionAmountVO(new Number('654')),
             $this->expenses,
             $this->account
         );
@@ -255,7 +255,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             $date,
-            new TransactionAmountVO('544'),
+            new TransactionAmountVO(new Number('544')),
             $this->expenses,
             $this->account
         );
@@ -268,7 +268,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->stock->getPrice(),
             $date,
-            new TransactionAmountVO('544'),
+            new TransactionAmountVO(new Number('544')),
             $this->expenses,
             $this->account
         );
@@ -284,7 +284,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock3,
             $this->stock3->getPrice(),
             new \DateTime('90 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('1500'),
+            new TransactionAmountVO(new Number('1500')),
             $this->expenses,
             $this->account
         );
@@ -295,7 +295,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock3,
             $this->stock3->getPrice(),
             new \DateTime('89 minutes ago', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('420'),
+            new TransactionAmountVO(new Number('420')),
             $this->expenses,
             $this->account
         );
@@ -314,7 +314,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('2021-09-21 09:44:12', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('440'),
+            new TransactionAmountVO(new Number('440')),
             $this->expenses,
             $this->account2
         );
@@ -325,7 +325,7 @@ class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock2,
             $this->stock2->getPrice(),
             new \DateTime('2021-09-23 10:51:21s', new \DateTimeZone('UTC')),
-            new TransactionAmountVO('600'),
+            new TransactionAmountVO(new Number('600')),
             $this->expenses,
             $this->account2
         );

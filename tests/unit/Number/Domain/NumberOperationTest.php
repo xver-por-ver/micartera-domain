@@ -28,7 +28,7 @@ class NumberOperationTest extends TestCase
     #[DataProvider('addProvider')]
     public function testAdd(string $result, int $decimals, string $operand1, string $operand2): void
     {
-        $this->assertSame($result, self::$numberOperation->add($decimals, new Number($operand1), new Number($operand2)));
+        $this->assertSame(new Number($result)->getValue(), self::$numberOperation->add($decimals, new Number($operand1), new Number($operand2))->getValue());
     }
 
     public static function addProvider(): array
@@ -50,7 +50,7 @@ class NumberOperationTest extends TestCase
     #[DataProvider('subtractProvider')]
     public function testSubtract(string $result, int $decimals, string $operand1, string $operand2): void
     {
-        $this->assertSame($result, self::$numberOperation->subtract($decimals, new Number($operand1), new Number($operand2)));
+        $this->assertSame(new Number($result)->getValue(), self::$numberOperation->subtract($decimals, new Number($operand1), new Number($operand2))->getValue());
     }
 
     public static function subtractProvider(): array
@@ -73,17 +73,17 @@ class NumberOperationTest extends TestCase
     public function testMultiply(string $result, int $decimals, string $operand1, string $operand2, ?\RoundingMode $roundingMode): void
     {
         $roundingMode
-        ? $this->assertSame($result, self::$numberOperation->multiply(
+        ? $this->assertSame(new Number($result)->getValue(), self::$numberOperation->multiply(
             $decimals,
             new Number($operand1),
             new Number($operand2),
             $roundingMode
-        ))
-        : $this->assertSame($result, self::$numberOperation->multiply(
+        )->getValue())
+        : $this->assertSame(new Number($result)->getValue(), self::$numberOperation->multiply(
             $decimals,
             new Number($operand1),
             new Number($operand2)
-        ));
+        )->getValue());
     }
 
     public static function multiplyProvider(): array
@@ -128,17 +128,17 @@ class NumberOperationTest extends TestCase
     public function testDivide(string $result, int $decimals, string $operand1, string $operand2, ?\RoundingMode $roundingMode): void
     {
         $roundingMode
-        ? $this->assertSame($result, self::$numberOperation->divide(
+        ? $this->assertSame(new Number($result)->getValue(), self::$numberOperation->divide(
             $decimals,
             new Number($operand1),
             new Number($operand2),
             $roundingMode
-        ))
-        : $this->assertSame($result, self::$numberOperation->divide(
+        )->getValue())
+        : $this->assertSame(new Number($result)->getValue(), self::$numberOperation->divide(
             $decimals,
             new Number($operand1),
             new Number($operand2)
-        ));
+        )->getValue());
     }
 
     public static function divideProvider(): array
@@ -168,7 +168,7 @@ class NumberOperationTest extends TestCase
     #[DataProvider('percentageProvider')]
     public function testPercentageDifference(string $result, int $decimals1, int $decimals2, string $operand1, string $operand2): void
     {
-        $this->assertSame($result, self::$numberOperation->percentageDifference($decimals1, $decimals2, new Number($operand1), new Number($operand2)));
+        $this->assertSame(new Number($result)->getValue(), self::$numberOperation->percentageDifference($decimals1, $decimals2, new Number($operand1), new Number($operand2))->getValue());
     }
 
     public static function percentageProvider(): array
@@ -236,7 +236,7 @@ class NumberOperationTest extends TestCase
     #[DataProvider('roundProvider')]
     public function testRound(string $result, int $decimals, string $number, \RoundingMode $mode): void
     {
-        $this->assertSame($result, self::$numberOperation->round($decimals, new Number($number), $mode));
+        $this->assertSame(new Number($result)->getValue(), self::$numberOperation->round($decimals, new Number($number), $mode)->getValue());
     }
 
     public static function roundProvider(): array

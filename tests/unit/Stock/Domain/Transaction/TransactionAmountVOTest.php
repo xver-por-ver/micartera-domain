@@ -26,11 +26,11 @@ class TransactionAmountVOTest extends TestCase
     {
         if ($exception) {
             $this->expectException(DomainViolationException::class);
-            $this->expectExceptionMessage($exceptionMsg);
+            $this->expectExceptionMessageIs($exceptionMsg);
         } else {
             $this->expectNotToPerformAssertions();
         }
-        new TransactionAmountVO($amount);
+        new TransactionAmountVO(new Number($amount));
     }
 
     public static function valuesToTest(): array

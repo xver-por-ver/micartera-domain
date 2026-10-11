@@ -81,25 +81,25 @@ class MovementTest extends TestCase
         $acquisition->method('getStock')->willReturn($this->stock);
         $acquisition->method('getDateTimeUtc')->willReturn(new \DateTime('30 minutes ago'));
         $acquisition->method('sameId')->willReturn(true);
-        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO($acquisitionAmountActionable));
-        $acquisition->method('getPrice')->willReturn(new StockPriceVO($acquisitionPrice, $currency));
+        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number($acquisitionAmountActionable)));
+        $acquisition->method('getPrice')->willReturn(new StockPriceVO(new Number($acquisitionPrice), $currency));
         $acquisition->method('getCurrency')->willReturn($currency);
-        $acquisition->method('getExpensesUnaccountedFor')->willReturn(new TransactionExpenseVO($acquisitionExpenses, $currency));
+        $acquisition->method('getExpensesUnaccountedFor')->willReturn(new TransactionExpenseVO(new Number($acquisitionExpenses), $currency));
 
         $liquidation = $this->createStub(Liquidation::class);
         $liquidation->method('getStock')->willReturn($this->stock);
         $liquidation->method('getDateTimeUtc')->willReturn(new \DateTime('20 minutes ago'));
         $liquidation->method('sameId')->willReturn(true);
-        $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO($liquidationAmountActionable));
-        $liquidation->method('getPrice')->willReturn(new StockPriceVO($liquidationPrice, $currency));
+        $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number($liquidationAmountActionable)));
+        $liquidation->method('getPrice')->willReturn(new StockPriceVO(new Number($liquidationPrice), $currency));
         $liquidation->method('getCurrency')->willReturn($currency);
-        $liquidation->method('getExpensesUnaccountedFor')->willReturn(new TransactionExpenseVO($liquidationExpenses, $currency));
+        $liquidation->method('getExpensesUnaccountedFor')->willReturn(new TransactionExpenseVO(new Number($liquidationExpenses), $currency));
 
         $accountingMovement = new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
         $this->assertSame($acquisition, $accountingMovement->getAcquisition());
         $this->assertSame($liquidation, $accountingMovement->getLiquidation());
         $this->assertTrue($accountingMovement->sameId($accountingMovement));
-        $this->assertSame(new TransactionAmountVO($movementAmount)->getValue(), $accountingMovement->getAmount()->getValue());
+        $this->assertSame(new TransactionAmountVO(new Number($movementAmount))->getValue(), $accountingMovement->getAmount()->getValue());
         $this->assertSame($movementAcquisitionPrice, $accountingMovement->getAcquisitionPrice()->getValueFormatted());
         $this->assertSame($movementLiquidationPrice, $accountingMovement->getLiquidationPrice()->getValueFormatted());
         $this->assertSame($movementAcquisitionExpenses, $accountingMovement->getAcquisitionExpenses()->getValue());
@@ -139,13 +139,13 @@ class MovementTest extends TestCase
         $acquisition = $this->createStub(Acquisition::class);
         $acquisition->method('getStock')->willReturn($this->stock);
         $acquisition->method('getDateTimeUtc')->willReturn(new \DateTime('20 minutes ago'));
-        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO('3'));
+        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number('3')));
         $acquisition->method('getPrice')->willReturn($price);
 
         $liquidation = $this->createStub(Liquidation::class);
         $liquidation->method('getStock')->willReturn($this->stock);
         $liquidation->method('getDateTimeUtc')->willReturn(new \DateTime('30 minutes ago'));
-        $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO('3'));
+        $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number('3')));
         $liquidation->method('getPrice')->willReturn($price);
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('accountingMovementAssertDateTime');
@@ -171,7 +171,7 @@ class MovementTest extends TestCase
         $acquisition = $this->createStub(Acquisition::class);
         $acquisition->method('getStock')->willReturn($this->stock);
         $acquisition->method('getDateTimeUtc')->willReturn(new \DateTime('30 minutes ago'));
-        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO('0'));
+        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number('0')));
 
         $liquidation = $this->createStub(Liquidation::class);
         $liquidation->method('getStock')->willReturn($this->stock);
@@ -186,12 +186,12 @@ class MovementTest extends TestCase
         $acquisition = $this->createStub(Acquisition::class);
         $acquisition->method('getStock')->willReturn($this->stock);
         $acquisition->method('getDateTimeUtc')->willReturn(new \DateTime('30 minutes ago'));
-        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO('10'));
+        $acquisition->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number('10')));
 
         $liquidation = $this->createStub(Liquidation::class);
         $liquidation->method('getStock')->willReturn($this->stock);
         $liquidation->method('getDateTimeUtc')->willReturn(new \DateTime('20 minutes ago'));
-        $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO('0'));
+        $liquidation->method('getAmountActionable')->willReturn(new TransactionAmountActionableVO(new Number('0')));
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('accountingMovementLiquidationHasNoAmountRemaining');
         new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);

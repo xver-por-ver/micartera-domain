@@ -190,7 +190,7 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
             $account->getCurrency()
         );
 
-        $expenses = new TransactionExpenseVO($result['totalAcquisitionFee'], $account->getCurrency());
+        $expenses = new TransactionExpenseVO(new Number($result['totalAcquisitionFee']), $account->getCurrency());
 
         return new SummaryVO(
             $totalAcquisitionPrice,

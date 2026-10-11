@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xver\MiCartera\Domain\Stock\Application\Command\Dividend;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
@@ -24,16 +25,12 @@ class CashDividendCreateCommand
         private StockPersistenceInterface $stockPersistence
     ) {}
 
-    /**
-     * @psalm-param numeric-string $dividendPerShareValue
-     * @psalm-param numeric-string $expensesValue
-     */
     public function invoke(
         string $stockCode,
         \DateTime $datetimeutc,
-        string $dividendPerShareValue,
+        Number $dividendPerShareValue,
         string $accountIdentifier,
-        string $expensesValue = '0'
+        ?Number $expensesValue = null
     ): CashDividend {
         $account = $this->accountPersistence->getRepository()->findByIdentifierOrThrowException($accountIdentifier);
         $stock = $this->stockPersistence->getRepository()->findByIdOrThrowException($stockCode);
@@ -46,7 +43,7 @@ class CashDividendCreateCommand
             $account,
             $datetimeutc,
             new CashDividendPerShareVO($dividendPerShareValue, $account->getCurrency()),
-            new CashDividendMoneyVO($expensesValue, $account->getCurrency())
+            new CashDividendMoneyVO($expensesValue ?? new Number('0'), $account->getCurrency())
         );
     }
 }

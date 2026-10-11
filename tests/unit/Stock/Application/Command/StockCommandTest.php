@@ -78,7 +78,7 @@ class StockCommandTest extends TestCase
         $account->method('getCurrency')->willReturn($this->currency);
         $this->repoAccount->method('findByIdentifierOrThrowException')->willReturn($account);
         $command = new StockCreateCommand($this->stockPersistence, $this->accountPersistence, $this->exchangePersistence);
-        $stock = $command->invoke('TEST', 'Test', '5.44', 'test@example.com', 'BME');
+        $stock = $command->invoke('TEST', 'Test', new \Xver\MiCartera\Domain\Number\Domain\Number('5.44'), 'test@example.com', 'BME');
         $this->assertInstanceOf(Stock::class, $stock);
     }
 
@@ -87,7 +87,7 @@ class StockCommandTest extends TestCase
         $this->expectNotToPerformAssertions();
         $this->repoStock->method('findByIdOrThrowException')->willReturn($this->stock);
         $command = new StockUpdateCommand($this->stockPersistence);
-        $command->invoke('TEST', 'Test', '5.44');
+        $command->invoke('TEST', 'Test', new \Xver\MiCartera\Domain\Number\Domain\Number('5.44'));
     }
 
     public function testRemoveCommandSucceeds(): void

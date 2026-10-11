@@ -37,12 +37,10 @@ class CashDividendAmountVO extends Number
     private function calculate(): Number
     {
         $numberOperation = new NumberOperation();
-        $amountAtTs = new Number(
-            $numberOperation->subtract(
-                $this->amountAcquisition->getMaxDecimals(),
-                $this->amountAcquisition,
-                $this->amountLiquidation
-            )
+        $amountAtTs = $numberOperation->subtract(
+            $this->amountAcquisition->getMaxDecimals(),
+            $this->amountAcquisition,
+            $this->amountLiquidation
         );
 
         if ($numberOperation->smallerOrEqual($this->maxDecimals, $amountAtTs, new Number('0'))) {

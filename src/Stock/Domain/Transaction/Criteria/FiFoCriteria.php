@@ -6,6 +6,7 @@ namespace Xver\MiCartera\Domain\Stock\Domain\Transaction\Criteria;
 
 use Symfony\Component\Translation\TranslatableMessage;
 use Xver\MiCartera\Domain\Account\Domain\Account;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPersistenceInterface;
@@ -155,7 +156,7 @@ class FiFoCriteria
     private function accountMovements(Liquidation $liquidation): void
     {
         foreach ($this->acquisitionsCollection->toArray() as $acquisition) {
-            if ($acquisition->getAmountActionable()->greater(new TransactionAmountActionableVO('0'))) {
+            if ($acquisition->getAmountActionable()->greater(new TransactionAmountActionableVO(new Number('0')))) {
                 try {
                     new Movement($this->movementPersistence, $this->acquisitionPersistence, $this->liquidationPersistence, $acquisition, $liquidation);
                 } catch (DomainViolationException $dv) {
@@ -170,14 +171,14 @@ class FiFoCriteria
                         $dv
                     );
                 }
-                if ($liquidation->getAmountActionable()->same(new TransactionAmountActionableVO('0'))) {
+                if ($liquidation->getAmountActionable()->same(new TransactionAmountActionableVO(new Number('0')))) {
                     break;
                 }
             }
         }
         if (
-            $liquidation->getAmountActionable()->different(new TransactionAmountActionableVO('0'))
-            || $liquidation->getExpensesUnaccountedFor()->different(new TransactionAmountActionableVO('0'))
+            $liquidation->getAmountActionable()->different(new TransactionAmountActionableVO(new Number('0')))
+            || $liquidation->getExpensesUnaccountedFor()->different(new TransactionAmountActionableVO(new Number('0')))
         ) {
             throw new DomainViolationException(
                 new TranslatableMessage(

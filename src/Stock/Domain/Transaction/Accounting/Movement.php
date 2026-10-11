@@ -80,7 +80,7 @@ class Movement implements EntityInterface
 
     private function setAmount(): self
     {
-        if ($this->acquisition->getAmountActionable()->same(new TransactionAmountActionableVO('0'))) {
+        if ($this->acquisition->getAmountActionable()->same(new TransactionAmountActionableVO(new Number('0')))) {
             throw new DomainViolationException(
                 new TranslatableMessage(
                     'accountingMovementAcquisitionHasNoAmountOutstanding',
@@ -90,7 +90,7 @@ class Movement implements EntityInterface
                 'movement.amount'
             );
         }
-        if ($this->liquidation->getAmountActionable()->same(new TransactionAmountActionableVO('0'))) {
+        if ($this->liquidation->getAmountActionable()->same(new TransactionAmountActionableVO(new Number('0')))) {
             throw new DomainViolationException(
                 new TranslatableMessage(
                     'accountingMovementLiquidationHasNoAmountRemaining',
@@ -102,8 +102,8 @@ class Movement implements EntityInterface
         }
         $this->amount
             = $this->acquisition->getAmountActionable()->smaller($this->liquidation->getAmountActionable())
-            ? new TransactionAmountVO($this->acquisition->getAmountActionable()->getValue())
-            : new TransactionAmountVO($this->liquidation->getAmountActionable()->getValue());
+            ? new TransactionAmountVO(new Number($this->acquisition->getAmountActionable()->getValue()))
+            : new TransactionAmountVO(new Number($this->liquidation->getAmountActionable()->getValue()));
 
         return $this;
     }
@@ -164,7 +164,7 @@ class Movement implements EntityInterface
         $applicableExpenses = $numberOperation->multiply(
             $unaccountedExpenses->getCurrency()->getDecimals(),
             $unaccountedExpenses,
-            new Number($ratio),
+            $ratio,
             \RoundingMode::TowardsZero
         );
 
@@ -174,7 +174,7 @@ class Movement implements EntityInterface
     public function getAcquisitionPrice(): MovementPriceVO
     {
         return new MovementPriceVO(
-            $this->acquisitionPrice->getValue(),
+            new Number($this->acquisitionPrice->getValue()),
             $this->getAcquisition()->getCurrency()
         );
     }
@@ -182,7 +182,7 @@ class Movement implements EntityInterface
     public function getLiquidationPrice(): MovementPriceVO
     {
         return new MovementPriceVO(
-            $this->liquidationPrice->getValue(),
+            new Number($this->liquidationPrice->getValue()),
             $this->getAcquisition()->getCurrency()
         );
     }
@@ -190,7 +190,7 @@ class Movement implements EntityInterface
     public function getAcquisitionExpenses(): TransactionExpenseVO
     {
         return new TransactionExpenseVO(
-            $this->acquisitionExpenses->getValue(),
+            new Number($this->acquisitionExpenses->getValue()),
             $this->getAcquisition()->getCurrency()
         );
     }
@@ -198,7 +198,7 @@ class Movement implements EntityInterface
     public function getLiquidationExpenses(): TransactionExpenseVO
     {
         return new TransactionExpenseVO(
-            $this->liquidationExpenses->getValue(),
+            new Number($this->liquidationExpenses->getValue()),
             $this->getAcquisition()->getCurrency()
         );
     }

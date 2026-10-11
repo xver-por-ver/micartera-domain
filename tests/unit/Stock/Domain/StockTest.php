@@ -194,7 +194,7 @@ class StockTest extends TestCase
         $stock = $this->getMockBuilder(Stock::class)->disableOriginalConstructor()->onlyMethods(['getCurrency'])->getMock();
         $stock->method('getCurrency')->willReturn($currency);
         $stock->expects($this->once())->method('getCurrency');
-        $stock->persistUpdate($this->stockPersistence, 'newName', new StockPriceVO('37.21', $this->stockPrice->getCurrency()));
+        $stock->persistUpdate($this->stockPersistence, 'newName', new StockPriceVO(new Number('37.21'), $this->stockPrice->getCurrency()));
     }
 
     public function testExceptionIsThrownOnCreateCommitFail(): void
@@ -217,7 +217,7 @@ class StockTest extends TestCase
         $stock = $this->getMockBuilder(Stock::class)->disableOriginalConstructor()->onlyMethods(['getCurrency'])->getMock();
         $stock->method('getCurrency')->willReturn($currency);
         $stock->expects($this->once())->method('getCurrency');
-        $stock->persistUpdate($this->stockPersistence, 'newName', new StockPriceVO('33.4451', $this->stockPrice->getCurrency()));
+        $stock->persistUpdate($this->stockPersistence, 'newName', new StockPriceVO(new Number('33.4451'), $this->stockPrice->getCurrency()));
     }
 
     public function testExceptionIsThrownOnRemoveCommitFail(): void

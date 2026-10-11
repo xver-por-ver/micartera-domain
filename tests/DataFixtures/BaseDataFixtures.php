@@ -13,6 +13,7 @@ use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Currency\Infrastructure\Doctrine\CurrencyPersistence;
 use Xver\MiCartera\Domain\Exchange\Domain\Exchange;
 use Xver\MiCartera\Domain\Exchange\Infrastructure\Doctrine\ExchangePersistence;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
@@ -52,12 +53,12 @@ class BaseDataFixtures extends Fixture
         );
         $exchangePersistence = new ExchangePersistence($this->registry);
         $exchange = new Exchange($exchangePersistence, 'MCE', 'Mercado Continuo Español');
-        $price = new StockPriceVO('2.5620', $currencyEuro);
+        $price = new StockPriceVO(new Number('2.5620'), $currencyEuro);
         $stockPersistence = new StockPersistence($this->registry);
         $stock = new Stock($stockPersistence, 'CABK', 'Caixabank', $price, $exchange);
-        $price2 = new StockPriceVO('3.5620', $currencyEuro);
+        $price2 = new StockPriceVO(new Number('3.5620'), $currencyEuro);
         new Stock($stockPersistence, 'SAN', 'Santander', $price2, $exchange);
-        $price3 = new StockPriceVO('5.9620', $currencyEuro);
+        $price3 = new StockPriceVO(new Number('5.9620'), $currencyEuro);
         new Stock($stockPersistence, 'ROVI', 'Laboratorios Rovi', $price3, $exchange);
         $acquisitionPersistence = new AcquisitionPersistence($this->registry);
         $liquidationPersistence = new LiquidationPersistence($this->registry);
@@ -71,8 +72,8 @@ class BaseDataFixtures extends Fixture
             $stock,
             $price,
             $dateAcquisition,
-            new TransactionAmountVO('200'),
-            new TransactionExpenseVO('10.23', $currencyEuro),
+            new TransactionAmountVO(new Number('200')),
+            new TransactionExpenseVO(new Number('10.23'), $currencyEuro),
             $account
         );
         new Liquidation(
@@ -82,8 +83,8 @@ class BaseDataFixtures extends Fixture
             $stock,
             $price,
             $dateLiquidation,
-            new TransactionAmountVO('1'),
-            new TransactionExpenseVO('1', $currencyEuro),
+            new TransactionAmountVO(new Number('1')),
+            new TransactionExpenseVO(new Number('1'), $currencyEuro),
             $account
         );
     }

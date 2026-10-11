@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Xver\MiCartera\Domain\Account\Domain\Account;
 use Xver\MiCartera\Domain\Currency\Domain\Currency;
 use Xver\MiCartera\Domain\Money\Domain\MoneyVO;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Application\Query\Transaction\Accounting\AccountingDTO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
@@ -84,8 +85,8 @@ class AccountingDTOTest extends TestCase
     {
         $currency = $this->account->getCurrency();
         $summary = $this->createStub(SummaryVO::class);
-        $summary->method('getAllTimeProfitPrice')->willReturn(new MoneyVO('5', $currency));
-        $summary->method('getDisplayedYearProfitPrice')->willReturn(new MoneyVO('3', $currency));
+        $summary->method('getAllTimeProfitPrice')->willReturn(new MoneyVO(new Number('5'), $currency));
+        $summary->method('getDisplayedYearProfitPrice')->willReturn(new MoneyVO(new Number('3'), $currency));
         $summary->method('getYearFirstLiquidation')->willReturn(2022);
         $dto = new AccountingDTO($this->account, new MovementCollection([]), 2024, $summary);
 
@@ -189,7 +190,7 @@ class AccountingDTOTest extends TestCase
     //     );
 
     //     $result = $accountingDTO->getMovementProfitPercentage(0);
-    //     $this->assertInstanceOf(\Xver\MiCartera\Domain\Number\Domain\Number::class, $result);
+    //     $this->assertInstanceOf(Number::class, $result);
     // }
 
     // public static function getMovementProfitPercentageProvider(): array

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xver\MiCartera\Domain\Stock\Application\Command\Dividend;
 
 use Symfony\Component\Uid\Uuid;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
@@ -15,11 +16,7 @@ final class CashDividendUpdateCommand
 {
     public function __construct(private CashDividendPersistenceInterface $cashDividendPersistence) {}
 
-    /**
-     * @psalm-param numeric-string $dividendPerShareValue
-     * @psalm-param numeric-string $expensesValue
-     */
-    public function invoke(string $cashDividendUuid, string $dividendPerShareValue, string $expensesValue): CashDividend
+    public function invoke(string $cashDividendUuid, Number $dividendPerShareValue, Number $expensesValue): CashDividend
     {
         $cashDividend = $this->cashDividendPersistence->getRepository()->findByIdOrThrowException(
             new Uuid($cashDividendUuid)

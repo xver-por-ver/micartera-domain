@@ -70,8 +70,8 @@ class CashDividendSummaryVOTest extends TestCase
     {
         $dividend = $this->createStub(CashDividend::class);
         $dividend->method('getDateTimeUtc')->willReturn(new \DateTime($date, new \DateTimeZone('UTC')));
-        $dividend->method('getTotalDividendPayment')->willReturn(new CashDividendMoneyVO($gross, $currency));
-        $dividend->method('getExpenses')->willReturn(new CashDividendMoneyVO($expenses, $currency));
+        $dividend->method('getTotalDividendPayment')->willReturn(new CashDividendMoneyVO(new Number($gross), $currency));
+        $dividend->method('getExpenses')->willReturn(new CashDividendMoneyVO(new Number($expenses), $currency));
 
         return $dividend;
     }

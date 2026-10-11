@@ -52,14 +52,12 @@ class SummaryVO
 
     public function getTotalProfitForecastPercentage(): Number
     {
-        $profitPercentage = $this->numberOperation->percentageDifference(
+        return $this->numberOperation->percentageDifference(
             $this->getTotalMarketsPrice()->getMaxDecimals(),
             2,
             $this->totalInvestment,
             $this->getTotalMarketsPrice()
         );
-
-        return new Number($profitPercentage);
     }
 
     public function getCurrency(): Currency
@@ -69,7 +67,7 @@ class SummaryVO
 
     private function calculateTotalProfitForecastPrice(): void
     {
-        $acqExpAsMovementPrice = new MovementPriceVO($this->getTotalAcquisitionsExpenses()->getValue(), $this->getCurrency());
+        $acqExpAsMovementPrice = new MovementPriceVO(new Number($this->getTotalAcquisitionsExpenses()->getValue()), $this->getCurrency());
 
         $this->totalInvestment = $this->getTotalAcquisitionsPrice()->add($acqExpAsMovementPrice);
 

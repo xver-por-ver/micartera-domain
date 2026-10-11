@@ -6,6 +6,7 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command;
 
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Exchange\Domain\ExchangePersistenceInterface;
+use Xver\MiCartera\Domain\Number\Domain\Number;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
@@ -21,13 +22,10 @@ class StockCreateCommand
         private ExchangePersistenceInterface $exchangePersistence
     ) {}
 
-    /**
-     * @psalm-param numeric-string $price
-     */
     public function invoke(
         string $code,
         string $name,
-        string $price,
+        Number $price,
         string $accountIdentifier,
         string $exchange
     ): Stock {

@@ -82,9 +82,9 @@ class AccountingQueryTest extends TestCase
             $displayedYear
         );
         $this->assertInstanceOf(AccountingDTO::class, $accountingDTO);
-        self::assertSame('12', $accountingDTO->getAllTimeCombinedNetResult()->getValue());
-        self::assertSame('5', $accountingDTO->getDisplayedYearCombinedNetResult()->getValue());
-        self::assertSame((int) new \DateTime('now')->format('Y'), $accountingDTO->getYearFirstOperation());
+        $this->assertSame('12', $accountingDTO->getAllTimeCombinedNetResult()->getValue());
+        $this->assertSame('5', $accountingDTO->getDisplayedYearCombinedNetResult()->getValue());
+        $this->assertSame((int) new \DateTime('now')->format('Y'), $accountingDTO->getYearFirstOperation());
     }
 
     public static function displayedYear(): array

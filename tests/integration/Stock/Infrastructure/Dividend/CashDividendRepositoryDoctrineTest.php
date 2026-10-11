@@ -95,10 +95,26 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
         parent::$loadFixtures = true;
         $cashDividend = $this->createCashDividend(new \DateTime('yesterday', new \DateTimeZone('UTC')));
 
-        self::assertSame(
+        $this->assertSame(
             $cashDividend,
             $this->cashDividentPersistence->getRepository()->findByIdOrThrowException($cashDividend->getId())
         );
+    }
+
+    public function testDividendPerSharePersistsAndReloadsWithTenDecimalPlaces(): void
+    {
+        parent::$loadFixtures = true;
+        $cashDividend = $this->createCashDividend(
+            new \DateTime('yesterday', new \DateTimeZone('UTC')),
+            '0.1234567891'
+        );
+        $cashDividendId = $cashDividend->getId();
+        parent::detachEntity($cashDividendId);
+
+        $reloaded = $this->cashDividentPersistence->getRepository()->findById($cashDividendId);
+
+        $this->assertInstanceOf(CashDividend::class, $reloaded);
+        $this->assertSame('0.1234567891', $reloaded->getDividendPerShare()->getValue());
     }
 
     public function testFindByIdOrThrowExceptionThrowsForMissingDividend(): void
@@ -113,12 +129,12 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
         $date = new \DateTime('yesterday', new \DateTimeZone('UTC'));
         $repository = $this->cashDividentPersistence->getRepository();
 
-        self::assertTrue($repository->assertNoCashDividendOnDateTime($this->account, $this->stock, $date));
+        $this->assertTrue($repository->assertNoCashDividendOnDateTime($this->account, $this->stock, $date));
         $this->createCashDividend($date);
-        self::assertFalse($repository->assertNoCashDividendOnDateTime($this->account, $this->stock, $date));
+        $this->assertFalse($repository->assertNoCashDividendOnDateTime($this->account, $this->stock, $date));
         $differentTime = clone $date;
         $differentTime->modify('+1 second');
-        self::assertTrue($repository->assertNoCashDividendOnDateTime($this->account, $this->stock, $differentTime));
+        $this->assertTrue($repository->assertNoCashDividendOnDateTime($this->account, $this->stock, $differentTime));
     }
 
     public function testFindByAccountStockAtOrAfterReturnsMatchingDividendsInDateOrder(): void
@@ -136,8 +152,8 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $firstDate
         );
 
-        self::assertCount(2, $dividends);
-        self::assertSame($firstDate->format('Y-m-d H:i:s'), $dividends->first()->getDateTimeUtc()->format('Y-m-d H:i:s'));
+        $this->assertCount(2, $dividends);
+        $this->assertSame($firstDate->format('Y-m-d H:i:s'), $dividends->first()->getDateTimeUtc()->format('Y-m-d H:i:s'));
     }
 
     public function testFindByAccountReturnsAllAccountDividendsInReverseDateOrder(): void
@@ -151,8 +167,8 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
 
         $dividends = $this->cashDividentPersistence->getRepository()->findByAccount($this->account);
 
-        self::assertCount(2, $dividends);
-        self::assertSame($date->format('Y-m-d H:i:s'), $dividends->first()->getDateTimeUtc()->format('Y-m-d H:i:s'));
+        $this->assertCount(2, $dividends);
+        $this->assertSame($date->format('Y-m-d H:i:s'), $dividends->first()->getDateTimeUtc()->format('Y-m-d H:i:s'));
     }
 
     public function testFindByAccountStockReturnsAllMatchingDividendsInReverseDateOrder(): void
@@ -166,8 +182,8 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
 
         $dividends = $this->cashDividentPersistence->getRepository()->findByAccountStock($this->account, $this->stock);
 
-        self::assertCount(2, $dividends);
-        self::assertSame($secondDate->format('Y-m-d H:i:s'), $dividends->first()->getDateTimeUtc()->format('Y-m-d H:i:s'));
+        $this->assertCount(2, $dividends);
+        $this->assertSame($secondDate->format('Y-m-d H:i:s'), $dividends->first()->getDateTimeUtc()->format('Y-m-d H:i:s'));
     }
 
     public function testfindById(): void
@@ -190,7 +206,7 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
         $this->assertEquals($cashDividendId, $cashDividend->getId());
     }
 
-    private function createCashDividend(\DateTime $date): CashDividend
+    private function createCashDividend(\DateTime $date, string $dividendPerShare = '145'): CashDividend
     {
         return new CashDividend(
             $this->cashDividentPersistence,
@@ -199,7 +215,7 @@ class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
             $this->stock,
             $this->account,
             $date,
-            new CashDividendPerShareVO('145', $this->account->getCurrency()),
+            new CashDividendPerShareVO($dividendPerShare, $this->account->getCurrency()),
             new CashDividendMoneyVO('3', $this->account->getCurrency())
         );
     }

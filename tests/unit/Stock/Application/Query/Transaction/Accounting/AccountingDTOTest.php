@@ -89,10 +89,10 @@ class AccountingDTOTest extends TestCase
         $summary->method('getYearFirstLiquidation')->willReturn(2022);
         $dto = new AccountingDTO($this->account, new MovementCollection([]), 2024, $summary);
 
-        self::assertInstanceOf(CashDividendSummaryVO::class, $dto->getCashDividendSummary());
-        self::assertSame('5', $dto->getAllTimeCombinedNetResult()->getValue());
-        self::assertSame('3', $dto->getDisplayedYearCombinedNetResult()->getValue());
-        self::assertSame(2022, $dto->getYearFirstOperation());
+        $this->assertInstanceOf(CashDividendSummaryVO::class, $dto->getCashDividendSummary());
+        $this->assertSame('5', $dto->getAllTimeCombinedNetResult()->getValue());
+        $this->assertSame('3', $dto->getDisplayedYearCombinedNetResult()->getValue());
+        $this->assertSame(2022, $dto->getYearFirstOperation());
     }
 
     public function testAccountingDTOWithNoAccountingMovements(): void

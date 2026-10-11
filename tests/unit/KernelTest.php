@@ -18,7 +18,7 @@ final class KernelTest extends TestCase
 
             try {
                 $kernel->boot();
-                self::assertSame($environment, $kernel->getEnvironment());
+                $this->assertSame($environment, $kernel->getEnvironment());
             } finally {
                 $kernel->shutdown();
             }
@@ -31,7 +31,7 @@ final class KernelTest extends TestCase
 
         try {
             $kernel->boot();
-            self::assertSame('staging', $kernel->getEnvironment());
+            $this->assertSame('staging', $kernel->getEnvironment());
         } finally {
             $kernel->shutdown();
         }

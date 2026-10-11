@@ -17,6 +17,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountException;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendRepositoryInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
@@ -32,6 +33,7 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[CoversClass(CashDividendAmountVO::class)]
 #[CoversClass(CashDividendAmountException::class)]
 #[CoversClass(CashDividendMoneyVO::class)]
+#[CoversClass(CashDividendPerShareVO::class)]
 #[UsesClass(MoneyVO::class)]
 #[UsesClass(Number::class)]
 #[UsesClass(NumberOperation::class)]
@@ -73,7 +75,7 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $persistence,
-            new CashDividendMoneyVO('0.5', $currency),
+            new CashDividendPerShareVO('0.5', $currency),
             new CashDividendMoneyVO('1.25', $currency)
         );
 
@@ -92,7 +94,7 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $this->createStub(CashDividendPersistenceInterface::class),
-            new CashDividendMoneyVO('0.5', $currency),
+            new CashDividendPerShareVO('0.5', $currency),
             new CashDividendMoneyVO('-1', $currency)
         );
     }
@@ -106,7 +108,7 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $this->createStub(CashDividendPersistenceInterface::class),
-            new CashDividendMoneyVO('0', $currency),
+            new CashDividendPerShareVO('0', $currency),
             new CashDividendMoneyVO('0', $currency)
         );
     }
@@ -122,7 +124,7 @@ class CashDividendTest extends TestCase
 
         $cashDividend->persistUpdate(
             $this->createStub(CashDividendPersistenceInterface::class),
-            new CashDividendMoneyVO('0.5', $otherCurrency),
+            new CashDividendPerShareVO('0.5', $otherCurrency),
             new CashDividendMoneyVO('0', $cashDividend->getAccount()->getCurrency())
         );
     }
@@ -187,12 +189,12 @@ class CashDividendTest extends TestCase
         $this->createCashDividend(new Number('200'), new Number('200'), '0.25', '0');
     }
 
-    public function testCashAmountsRespectCurrencyPrecision(): void
+    public function testDividendPerShareSupportsPrecisionBeyondCurrencyDecimals(): void
     {
-        $this->expectException(DomainViolationException::class);
-        $this->expectExceptionMessageIs('numberPrecision');
+        $cashDividend = $this->createCashDividend(new Number('200'), new Number('0'), '0.001', '0');
 
-        $this->createCashDividend(new Number('200'), new Number('0'), '0.001', '0');
+        self::assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
+        self::assertSame('0.2', $cashDividend->getTotalDividendPayment()->getValue());
     }
 
     public function testRejectsMismatchedStockCurrency(): void
@@ -289,7 +291,7 @@ class CashDividendTest extends TestCase
             $stock,
             $account,
             $date ?? new \DateTime('yesterday', new \DateTimeZone('UTC')),
-            new CashDividendMoneyVO($dividendPerShare, $dividendPerShareCurrencyMatches ? $currency : $otherCurrency),
+            new CashDividendPerShareVO($dividendPerShare, $dividendPerShareCurrencyMatches ? $currency : $otherCurrency),
             new CashDividendMoneyVO($expenses, $expensesCurrencyMatches ? $currency : $otherCurrency)
         );
     }

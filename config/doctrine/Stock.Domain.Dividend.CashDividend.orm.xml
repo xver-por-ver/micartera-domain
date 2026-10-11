@@ -7,7 +7,7 @@
     <id name="id" type="uuid" column="id"/>
     <field name="datetimeutc" type="datetime" column="datetimeutc" nullable="false"/>
     <embedded name="amount" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountVO" use-column-prefix="false" />
-    <embedded name="dividendPerShare" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO" column-prefix="dividend_per_share_" />
+    <embedded name="dividendPerShare" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO" column-prefix="dividend_per_share_" />
     <embedded name="totalDividendPayment" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO" column-prefix="total_dividend_payment_" />
     <embedded name="expenses" class="Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO" column-prefix="expenses_" />
     <many-to-one field="stock" target-entity="Xver\MiCartera\Domain\Stock\Domain\Stock" fetch="EAGER">

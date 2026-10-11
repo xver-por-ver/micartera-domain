@@ -7,6 +7,7 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Dividend;
 use Symfony\Component\Uid\Uuid;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPersistenceInterface;
 
 /** @psalm-api */
@@ -26,7 +27,7 @@ final class CashDividendUpdateCommand
 
         return $cashDividend->persistUpdate(
             $this->cashDividendPersistence,
-            new CashDividendMoneyVO($dividendPerShareValue, $cashDividend->getAccount()->getCurrency()),
+            new CashDividendPerShareVO($dividendPerShareValue, $cashDividend->getAccount()->getCurrency()),
             new CashDividendMoneyVO($expensesValue, $cashDividend->getAccount()->getCurrency())
         );
     }

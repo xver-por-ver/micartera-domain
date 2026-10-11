@@ -7,6 +7,7 @@ namespace Xver\MiCartera\Domain\Stock\Application\Command\Dividend;
 use Xver\MiCartera\Domain\Account\Domain\AccountPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividend;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
+use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\StockPersistenceInterface;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionPersistenceInterface;
@@ -44,7 +45,7 @@ class CashDividendCreateCommand
             $stock,
             $account,
             $datetimeutc,
-            new CashDividendMoneyVO($dividendPerShareValue, $account->getCurrency()),
+            new CashDividendPerShareVO($dividendPerShareValue, $account->getCurrency()),
             new CashDividendMoneyVO($expensesValue, $account->getCurrency())
         );
     }

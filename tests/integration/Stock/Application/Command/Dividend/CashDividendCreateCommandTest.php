@@ -108,15 +108,15 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         self::$loadFixtures = true;
         $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.25', 'test@example.com');
 
-        self::assertInstanceOf(CashDividend::class, $cashDividend);
-        self::assertSame('200', $cashDividend->getAmount()->getValue());
-        self::assertSame('0.25', $cashDividend->getDividendPerShare()->getValue());
-        self::assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
-        self::assertSame('0', $cashDividend->getExpenses()->getValue());
+        $this->assertInstanceOf(CashDividend::class, $cashDividend);
+        $this->assertSame('200', $cashDividend->getAmount()->getValue());
+        $this->assertSame('0.25', $cashDividend->getDividendPerShare()->getValue());
+        $this->assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('0', $cashDividend->getExpenses()->getValue());
 
         $returnedDate = $cashDividend->getDateTimeUtc();
         $returnedDate->modify('+1 day');
-        self::assertSame(
+        $this->assertSame(
             $this->dateAtSecond(0)->format('Y-m-d H:i:s'),
             $cashDividend->getDateTimeUtc()->format('Y-m-d H:i:s')
         );
@@ -130,9 +130,9 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         $updated = new CashDividendUpdateCommand(new CashDividendPersistence(self::$registry))
             ->invoke($cashDividend->getId()->toString(), '0.40', '1.20');
 
-        self::assertSame('0.4', $updated->getDividendPerShare()->getValue());
-        self::assertSame('1.2', $updated->getExpenses()->getValue());
-        self::assertSame('80', $updated->getTotalDividendPayment()->getValue());
+        $this->assertSame('0.4', $updated->getDividendPerShare()->getValue());
+        $this->assertSame('1.2', $updated->getExpenses()->getValue());
+        $this->assertSame('80', $updated->getTotalDividendPayment()->getValue());
     }
 
     public function testDeletesCashDividendById(): void
@@ -143,7 +143,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         new CashDividendDeleteCommand(new CashDividendPersistence(self::$registry))
             ->invoke($cashDividend->getId()->toString());
 
-        self::assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
+        $this->assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
     }
 
     public function testRecordsExpensesSeparatelyFromGrossDividendPayment(): void
@@ -151,8 +151,8 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         self::$loadFixtures = true;
         $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.25', 'test@example.com', '1.50');
 
-        self::assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
-        self::assertSame('1.5', $cashDividend->getExpenses()->getValue());
+        $this->assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('1.5', $cashDividend->getExpenses()->getValue());
     }
 
     public function testRejectsDuplicateCashDividendForSameAccountStockAndDateTime(): void
@@ -170,7 +170,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         self::$loadFixtures = true;
         $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(0), '0.001', 'test@example.com');
 
-        self::assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
+        $this->assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
     }
 
     public function testRejectsCashDividendWhenNoHoldingOnOperationDateDespiteLaterHolding(): void
@@ -186,8 +186,8 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
     {
         self::$loadFixtures = true;
         $cashDividend = $this->createCommand()->invoke('CABK', $this->dateAtSecond(5), '0.25', 'test@example.com');
-        self::assertNotNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
-        self::assertCount(1, new CashDividendPersistence(self::$registry)->getRepository()->findByAccountStockAtOrAfter($cashDividend->getAccount(), $cashDividend->getStock(), $this->dateAtSecond(2)));
+        $this->assertNotNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
+        $this->assertCount(1, new CashDividendPersistence(self::$registry)->getRepository()->findByAccountStockAtOrAfter($cashDividend->getAccount(), $cashDividend->getStock(), $this->dateAtSecond(2)));
 
         $this->createAcquisitionCommand()->invoke(
             'CABK',
@@ -198,9 +198,9 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
             'test@example.com'
         );
 
-        self::assertSame('204', $cashDividend->getAmount()->getValue());
-        self::assertSame('51', $cashDividend->getTotalDividendPayment()->getValue());
-        self::assertSame('0', $cashDividend->getExpenses()->getValue());
+        $this->assertSame('204', $cashDividend->getAmount()->getValue());
+        $this->assertSame('51', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('0', $cashDividend->getExpenses()->getValue());
     }
 
     public function testLiquidationThatRemovesEntirePositionDeletesAffectedDividend(): void
@@ -217,7 +217,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
             'test@example.com'
         );
 
-        self::assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
+        $this->assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
     }
 
     public function testDeletingAcquisitionRemovesCashDividendBeforeLaterReplacement(): void
@@ -236,7 +236,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
 
         new AcquisitionDeleteCommand($this->acquisitionPersistence(), $this->cashDividendSynchronizer())
             ->invoke($acquisition->getId()->toString());
-        self::assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
+        $this->assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
 
         $replacement = $this->createAcquisitionCommand()->invoke(
             'SAN',
@@ -246,8 +246,8 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
             '0',
             'test@example.com'
         );
-        self::assertSame('12', $replacement->getAmount()->getValue());
-        self::assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
+        $this->assertSame('12', $replacement->getAmount()->getValue());
+        $this->assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
     }
 
     public function testDeletingAcquisitionThatLeavesNoHoldingDeletesAffectedDividend(): void
@@ -266,7 +266,7 @@ class CashDividendCreateCommandTest extends IntegrationTestCase
         new AcquisitionDeleteCommand($this->acquisitionPersistence(), $this->cashDividendSynchronizer())
             ->invoke($acquisition->getId()->toString());
 
-        self::assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
+        $this->assertNull(new CashDividendPersistence(self::$registry)->getRepository()->findById($cashDividend->getId()));
     }
 
     private function createCommand(): CashDividendCreateCommand

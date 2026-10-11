@@ -44,25 +44,25 @@ class CashDividendTest extends TestCase
     {
         $cashDividend = $this->createCashDividend(new Number('200'), new Number('1'), '0.25', '1.50');
 
-        self::assertSame('199', $cashDividend->getAmount()->getValue());
-        self::assertSame('0.25', $cashDividend->getDividendPerShare()->getValue());
-        self::assertSame('49.75', $cashDividend->getTotalDividendPayment()->getValue());
-        self::assertSame('1.5', $cashDividend->getExpenses()->getValue());
+        $this->assertSame('199', $cashDividend->getAmount()->getValue());
+        $this->assertSame('0.25', $cashDividend->getDividendPerShare()->getValue());
+        $this->assertSame('49.75', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('1.5', $cashDividend->getExpenses()->getValue());
     }
 
     public function testExpensesCanDefaultToZero(): void
     {
         $cashDividend = $this->createCashDividend(new Number('200'), new Number('0'), '0.25', '0');
 
-        self::assertSame('0', $cashDividend->getExpenses()->getValue());
-        self::assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('0', $cashDividend->getExpenses()->getValue());
+        $this->assertSame('50', $cashDividend->getTotalDividendPayment()->getValue());
     }
 
     public function testNetDividendPaymentSubtractsExpensesFromGrossPayment(): void
     {
         $cashDividend = $this->createCashDividend(new Number('200'), new Number('1'), '0.25', '1.50');
 
-        self::assertSame('48.25', $cashDividend->getNetDividendPayment()->getValue());
+        $this->assertSame('48.25', $cashDividend->getNetDividendPayment()->getValue());
     }
 
     public function testPersistUpdateRecalculatesPaymentAndPreservesHolding(): void
@@ -79,10 +79,10 @@ class CashDividendTest extends TestCase
             new CashDividendMoneyVO('1.25', $currency)
         );
 
-        self::assertSame('199', $cashDividend->getAmount()->getValue());
-        self::assertSame('0.5', $cashDividend->getDividendPerShare()->getValue());
-        self::assertSame('1.25', $cashDividend->getExpenses()->getValue());
-        self::assertSame('99.5', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('199', $cashDividend->getAmount()->getValue());
+        $this->assertSame('0.5', $cashDividend->getDividendPerShare()->getValue());
+        $this->assertSame('1.25', $cashDividend->getExpenses()->getValue());
+        $this->assertSame('99.5', $cashDividend->getTotalDividendPayment()->getValue());
     }
 
     public function testPersistUpdateRejectsNegativeExpenses(): void
@@ -152,11 +152,11 @@ class CashDividendTest extends TestCase
     {
         $cashDividend = $this->createCashDividend(new Number('200'), new Number('1'), '0.25', '0');
 
-        self::assertInstanceOf(Uuid::class, $cashDividend->getId());
-        self::assertTrue($cashDividend->sameId($cashDividend));
-        self::assertInstanceOf(Stock::class, $cashDividend->getStock());
-        self::assertInstanceOf(Account::class, $cashDividend->getAccount());
-        self::assertSame('UTC', $cashDividend->getDateTimeUtc()->getTimezone()->getName());
+        $this->assertInstanceOf(Uuid::class, $cashDividend->getId());
+        $this->assertTrue($cashDividend->sameId($cashDividend));
+        $this->assertInstanceOf(Stock::class, $cashDividend->getStock());
+        $this->assertInstanceOf(Account::class, $cashDividend->getAccount());
+        $this->assertSame('UTC', $cashDividend->getDateTimeUtc()->getTimezone()->getName());
     }
 
     public function testSameIdRejectsAnEntityOfAnotherType(): void
@@ -193,8 +193,8 @@ class CashDividendTest extends TestCase
     {
         $cashDividend = $this->createCashDividend(new Number('200'), new Number('0'), '0.001', '0');
 
-        self::assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
-        self::assertSame('0.2', $cashDividend->getTotalDividendPayment()->getValue());
+        $this->assertSame('0.001', $cashDividend->getDividendPerShare()->getValue());
+        $this->assertSame('0.2', $cashDividend->getTotalDividendPayment()->getValue());
     }
 
     public function testRejectsMismatchedStockCurrency(): void

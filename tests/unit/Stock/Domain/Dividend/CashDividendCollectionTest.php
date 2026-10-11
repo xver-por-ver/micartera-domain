@@ -17,6 +17,6 @@ class CashDividendCollectionTest extends TestCase
     {
         $cashDividendCollection = new CashDividendCollection([]);
 
-        self::assertSame(CashDividend::class, $cashDividendCollection->type());
+        $this->assertSame(CashDividend::class, $cashDividendCollection->type());
     }
 }

@@ -39,14 +39,14 @@ class CashDividendSummaryVOTest extends TestCase
         $collection = new CashDividendCollection([$prior, $current]);
         $summary = new CashDividendSummaryVO($collection, $account, 2024);
 
-        self::assertSame(2024, $summary->getYearFirstDividend());
-        self::assertCount(2, $summary->getDisplayedYearDividends());
-        self::assertSame('30', $summary->getAllTimeGross()->getValue());
-        self::assertSame('3', $summary->getAllTimeExpenses()->getValue());
-        self::assertSame('27', $summary->getAllTimeNet()->getValue());
-        self::assertSame('30', $summary->getDisplayedYearGross()->getValue());
-        self::assertSame('3', $summary->getDisplayedYearExpenses()->getValue());
-        self::assertSame('27', $summary->getDisplayedYearNet()->getValue());
+        $this->assertSame(2024, $summary->getYearFirstDividend());
+        $this->assertCount(2, $summary->getDisplayedYearDividends());
+        $this->assertSame('30', $summary->getAllTimeGross()->getValue());
+        $this->assertSame('3', $summary->getAllTimeExpenses()->getValue());
+        $this->assertSame('27', $summary->getAllTimeNet()->getValue());
+        $this->assertSame('30', $summary->getDisplayedYearGross()->getValue());
+        $this->assertSame('3', $summary->getDisplayedYearExpenses()->getValue());
+        $this->assertSame('27', $summary->getDisplayedYearNet()->getValue());
     }
 
     public function testEmptyDividendsHaveZeroTotalsAndNoFirstYear(): void
@@ -60,10 +60,10 @@ class CashDividendSummaryVOTest extends TestCase
 
         $summary = new CashDividendSummaryVO(new CashDividendCollection([]), $account, 2024);
 
-        self::assertNull($summary->getYearFirstDividend());
-        self::assertCount(0, $summary->getDisplayedYearDividends());
-        self::assertSame('0', $summary->getAllTimeGross()->getValue());
-        self::assertSame('0', $summary->getDisplayedYearNet()->getValue());
+        $this->assertNull($summary->getYearFirstDividend());
+        $this->assertCount(0, $summary->getDisplayedYearDividends());
+        $this->assertSame('0', $summary->getAllTimeGross()->getValue());
+        $this->assertSame('0', $summary->getDisplayedYearNet()->getValue());
     }
 
     private function dividend(Currency $currency, string $date, string $gross, string $expenses): CashDividend

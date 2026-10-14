@@ -23,6 +23,10 @@ use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
  */
 class LiquidationRepository extends EntityRepository implements LiquidationRepositoryInterface
 {
+    private const string ACCOUNT_WHERE = 't.account = :account_id';
+    private const string STOCK_WHERE = 't.stock = :stock_code';
+    private const string DATE_FORMAT = 'Y-m-d H:i:s';
+
     public function __construct(ManagerRegistry $managerRegistry)
     {
         parent::__construct($managerRegistry, Liquidation::class);
@@ -48,8 +52,21 @@ class LiquidationRepository extends EntityRepository implements LiquidationRepos
         return $entity;
     }
 
+    /**
+     * @deprecated use findByStock() instead
+     */
     #[\Override]
-    public function findByStockId(Stock $stock, int $limit = 1, int $offset = 0): LiquidationCollection // TODO: rename to findByStock
+    public function findByStockId(Stock $stock, int $limit = 1, int $offset = 0): LiquidationCollection
+    {
+        return $this->findByStock(
+            $stock,
+            $limit,
+            $offset
+        );
+    }
+
+    #[\Override]
+    public function findByStock(Stock $stock, int $limit = 1, int $offset = 0): LiquidationCollection
     {
         return new LiquidationCollection(
             $this->findBy(
@@ -68,12 +85,12 @@ class LiquidationRepository extends EntityRepository implements LiquidationRepos
         \DateTime $datetimeutc
     ): bool {
         $qb = $this->createQueryBuilder('t')
-            ->where('t.account = :account_id')
-            ->andWhere('t.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('t.datetimeutc = :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
-            ->setParameter('datetimeutc', $datetimeutc->format('Y-m-d H:i:s'))
+            ->setParameter('datetimeutc', $datetimeutc->format(self::DATE_FORMAT))
         ;
 
         return null === $qb->getQuery()->getOneOrNullResult();
@@ -86,12 +103,12 @@ class LiquidationRepository extends EntityRepository implements LiquidationRepos
         \DateTime $date
     ): LiquidationCollection {
         $qb = $this->createQueryBuilder('t')
-            ->where('t.account = :account_id')
-            ->andWhere('t.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('t.datetimeutc >= :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
-            ->setParameter('datetimeutc', $date->format('Y-m-d H:i:s'))
+            ->setParameter('datetimeutc', $date->format(self::DATE_FORMAT))
             ->orderBy('t.datetimeutc', 'ASC')
         ;
 
@@ -111,12 +128,12 @@ class LiquidationRepository extends EntityRepository implements LiquidationRepos
     {
         $qr = $this->createQueryBuilder('t')
             ->select('COALESCE(SUM(t.amount.value), 0)')
-            ->where('t.account = :account_id')
-            ->andWhere('t.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('t.datetimeutc <= :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
-            ->setParameter('datetimeutc', $date->format('Y-m-d H:i:s'))
+            ->setParameter('datetimeutc', $date->format(self::DATE_FORMAT))
             ->getQuery()
             ->getSingleScalarResult();
 

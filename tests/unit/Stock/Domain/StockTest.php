@@ -162,7 +162,7 @@ class StockTest extends TestCase
         $this->stockPersistence->expects($this->never())->method('remove');
         $acquisitionsColletion = $this->createStub(AcquisitionCollection::class);
         $acquisitionsColletion->method('count')->willReturn(1);
-        $this->repoAcquisition->method('findByStockId')->willReturn($acquisitionsColletion);
+        $this->repoAcquisition->method('findByStock')->willReturn($acquisitionsColletion);
         $this->expectException(DomainViolationException::class);
         $this->expectExceptionMessageIs('stockHasTransactions');
 

@@ -34,7 +34,16 @@ interface AcquisitionRepositoryInterface extends EntityRepositoryInterface
         int $offset = 0
     ): AcquisitionCollection;
 
+    /**
+     * @deprecated use findByStock() instead
+     */
     public function findByStockId(
+        Stock $stock,
+        int $limit = 1,
+        int $offset = 0
+    ): AcquisitionCollection;
+
+    public function findByStock(
         Stock $stock,
         int $limit = 1,
         int $offset = 0

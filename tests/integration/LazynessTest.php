@@ -68,6 +68,7 @@ class LazynessTest extends IntegrationTestCase
         $this->invokeMethod($instance, 'findByIdOrThrowException', $this->acquisition->getId());
         $this->invokeMethod($instance, 'findByAccountStockWithActionableAmountAndDateAtOrBefore', $this->account, $this->stock, new \DateTime('first day of january', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'findByStockId', $this->stock);
+        $this->invokeMethod($instance, 'findByStock', $this->stock);
         $this->invokeMethod($instance, 'assertNoTransWithSameAccountStockOnDateTime', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'findByAccountWithActionableAmount', $this->account, 'ASC');
         $this->invokeMethod($instance, 'portfolioSummary', $this->account);
@@ -76,6 +77,7 @@ class LazynessTest extends IntegrationTestCase
         $this->invokeMethod($instance, 'findById', $this->liquidation->getId());
         $this->invokeMethod($instance, 'findByIdOrThrowException', $this->liquidation->getId());
         $this->invokeMethod($instance, 'findByStockId', $this->stock);
+        $this->invokeMethod($instance, 'findByStock', $this->stock);
         $this->invokeMethod($instance, 'assertNoTransWithSameAccountStockOnDateTime', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'findByAccountStockAndDateAtOrAfter', $this->account, $this->stock, new \DateTime('2 years ago', new \DateTimeZone('UTC')));
         $this->invokeMethod($instance, 'totalAmountForAccountStockAtOrBefore', $this->account, $this->stock, new \DateTime('now', new \DateTimeZone('UTC')));

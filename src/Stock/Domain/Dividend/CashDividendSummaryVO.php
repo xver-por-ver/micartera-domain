@@ -12,9 +12,9 @@ use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 final class CashDividendSummaryVO
 {
     private CashDividendMoneyVO $allTimeGross;
-    private CashDividendMoneyVO $allTimeExpenses; // @TODO this should be MoneyVO
+    private CashDividendMoneyVO $allTimeExpenses;
     private CashDividendMoneyVO $displayedYearGross;
-    private CashDividendMoneyVO $displayedYearExpenses; // @TODO this should be MoneyVO
+    private CashDividendMoneyVO $displayedYearExpenses;
     private ?int $yearFirstDividend = null;
     private CashDividendCollection $displayedYearDividends;
 

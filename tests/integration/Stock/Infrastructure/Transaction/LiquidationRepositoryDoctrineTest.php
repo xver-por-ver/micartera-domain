@@ -181,10 +181,10 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
         }
     }
 
-    public function testFindByStockId(): void
+    public function testFindByStock(): void
     {
         parent::$loadFixtures = true;
-        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStockId($this->stock2, 20, 0);
+        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStock($this->stock2, 20, 0);
         $this->assertInstanceOf(LiquidationCollection::class, $transactionsCollection);
         $this->assertSame(0, $transactionsCollection->count());
         new Acquisition(
@@ -220,12 +220,12 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
             $this->expenses,
             $this->account
         );
-        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStockId($this->stock2, 20, 0);
+        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStock($this->stock2, 20, 0);
         $this->assertSame(2, $transactionsCollection->count());
         foreach ($transactionsCollection->toArray() as $transaction) {
             $this->assertSame($this->stock2->getId(), $transaction->getStock()->getId());
         }
-        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStockId($this->stock2, 1, 0);
+        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStock($this->stock2, 1, 0);
         $this->assertSame(1, $transactionsCollection->count());
     }
 
@@ -234,7 +234,7 @@ class LiquidationRepositoryDoctrineTest extends IntegrationTestCase
         /** @var Stock&Stub */
         $stock = $this->createStub(Stock::class);
         $stock->method('getId')->willReturn('NONEXISTENT');
-        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStockId($stock, 2, 0);
+        $transactionsCollection = $this->liquidationPersistence->getRepository()->findByStock($stock, 2, 0);
         $this->assertInstanceOf(LiquidationCollection::class, $transactionsCollection);
         $this->assertSame(0, $transactionsCollection->count());
     }

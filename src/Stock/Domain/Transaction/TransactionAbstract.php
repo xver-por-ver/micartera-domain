@@ -40,7 +40,7 @@ abstract class TransactionAbstract implements EntityInterface
         $this->generateId();
     }
 
-    private function validateNoTransactionDateInFuture(): void // TODO: return class instance
+    private function validateNoTransactionDateInFuture(): self
     {
         if ($this->datetimeutc > new \DateTime('now', new \DateTimeZone('UTC'))) {
             throw new DomainViolationException(
@@ -52,9 +52,11 @@ abstract class TransactionAbstract implements EntityInterface
                 'transaction.datetimeutc'
             );
         }
+
+        return $this;
     }
 
-    private function validateStockAndStockPriceSameCurrency(): void // TODO: return class instance
+    private function validateStockAndStockPriceSameCurrency(): self
     {
         if (false === $this->getCurrency()->sameId($this->getPrice()->getCurrency())) {
             throw new DomainViolationException(
@@ -66,9 +68,11 @@ abstract class TransactionAbstract implements EntityInterface
                 'transaction.price'
             );
         }
+
+        return $this;
     }
 
-    private function validateStockAndExpensesSameCurrency(): void // TODO: return class instance
+    private function validateStockAndExpensesSameCurrency(): self
     {
         if (false === $this->expenses->getCurrency()->sameId($this->getCurrency())) {
             throw new DomainViolationException(
@@ -80,6 +84,8 @@ abstract class TransactionAbstract implements EntityInterface
                 'transaction.expenses'
             );
         }
+
+        return $this;
     }
 
     private function generateId(): void

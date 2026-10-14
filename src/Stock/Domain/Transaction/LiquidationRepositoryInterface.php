@@ -25,7 +25,16 @@ interface LiquidationRepositoryInterface extends EntityRepositoryInterface
 
     public function findByIdOrThrowException(Uuid $id): Liquidation;
 
+    /**
+     * @deprecated use findByStock() instead
+     */
     public function findByStockId(
+        Stock $stock,
+        int $limit = 1,
+        int $offset = 0
+    ): LiquidationCollection;
+
+    public function findByStock(
         Stock $stock,
         int $limit = 1,
         int $offset = 0

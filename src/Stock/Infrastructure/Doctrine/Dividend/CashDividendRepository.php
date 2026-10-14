@@ -21,6 +21,9 @@ use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
  */
 class CashDividendRepository extends EntityRepository implements CashDividendRepositoryInterface
 {
+    private const string ACCOUNT_WHERE = 'd.account = :account_id';
+    private const string STOCK_WHERE = 'd.stock = :stock_code';
+
     public function __construct(ManagerRegistry $managerRegistry)
     {
         parent::__construct($managerRegistry, CashDividend::class);
@@ -48,8 +51,8 @@ class CashDividendRepository extends EntityRepository implements CashDividendRep
     {
         $qb = $this->createQueryBuilder('d')
             ->select('d.id')
-            ->where('d.account = :account_id')
-            ->andWhere('d.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('d.datetimeutc = :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
@@ -64,7 +67,7 @@ class CashDividendRepository extends EntityRepository implements CashDividendRep
     {
         /** @var array<int, CashDividend> $dividends */
         $dividends = $this->createQueryBuilder('d')
-            ->where('d.account = :account_id')
+            ->where(self::ACCOUNT_WHERE)
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->orderBy('d.datetimeutc', 'ASC')
             ->getQuery()
@@ -78,8 +81,8 @@ class CashDividendRepository extends EntityRepository implements CashDividendRep
     {
         /** @var array<int, CashDividend> $dividends */
         $dividends = $this->createQueryBuilder('d')
-            ->where('d.account = :account_id')
-            ->andWhere('d.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
             ->orderBy('d.datetimeutc', 'DESC')
@@ -94,8 +97,8 @@ class CashDividendRepository extends EntityRepository implements CashDividendRep
     {
         /** @var array<int, CashDividend> $dividends */
         $dividends = $this->createQueryBuilder('d')
-            ->where('d.account = :account_id')
-            ->andWhere('d.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('d.datetimeutc >= :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())

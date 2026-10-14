@@ -165,7 +165,7 @@ class Stock implements EntityInterface
         StockPersistenceInterface $stockPersistence
     ): void {
         $repoAcquisition = $stockPersistence->getRepositoryForAcquisition();
-        if (0 !== $repoAcquisition->findByStockId($this)->count()) {
+        if (0 !== $repoAcquisition->findByStock($this)->count()) {
             throw new DomainViolationException(
                 new TranslatableMessage(
                     'stockHasTransactions',

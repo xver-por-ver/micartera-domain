@@ -29,6 +29,10 @@ use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
  */
 class AcquisitionRepository extends EntityRepository implements AcquisitionRepositoryInterface
 {
+    private const string ACCOUNT_WHERE = 't.account = :account_id';
+    private const string STOCK_WHERE = 't.stock = :stock_code';
+    private const string DATE_FORMAT = 'Y-m-d H:i:s';
+
     public function __construct(ManagerRegistry $managerRegistry)
     {
         parent::__construct($managerRegistry, Acquisition::class);
@@ -58,13 +62,13 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
         \DateTime $date
     ): AcquisitionCollection {
         $qb = $this->createQueryBuilder('t')
-            ->where('t.account = :account_id')
-            ->andWhere('t.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('t.amountActionable.value > 0')
             ->andWhere('t.datetimeutc <= :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
-            ->setParameter('datetimeutc', $date->format('Y-m-d H:i:s'))
+            ->setParameter('datetimeutc', $date->format(self::DATE_FORMAT))
             ->orderBy('t.datetimeutc', 'ASC')
         ;
 
@@ -79,8 +83,21 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
         return new AcquisitionCollection($result);
     }
 
+    /**
+     * @deprecated use findByStock() instead
+     */
     #[\Override]
-    public function findByStockId(
+    public function findByStockId(Stock $stock, int $limit = 1, int $offset = 0): AcquisitionCollection
+    {
+        return $this->findByStock(
+            $stock,
+            $limit,
+            $offset
+        );
+    }
+
+    #[\Override]
+    public function findByStock(
         Stock $stock,
         int $limit = 1,
         int $offset = 0
@@ -102,12 +119,12 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
         \DateTime $datetimeutc
     ): bool {
         $qb = $this->createQueryBuilder('t')
-            ->where('t.account = :account_id')
-            ->andWhere('t.stock = :stock_code')
+            ->where(self::ACCOUNT_WHERE)
+            ->andWhere(self::STOCK_WHERE)
             ->andWhere('t.datetimeutc = :datetimeutc')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->setParameter('stock_code', $stock->getId())
-            ->setParameter('datetimeutc', $datetimeutc->format('Y-m-d H:i:s'))
+            ->setParameter('datetimeutc', $datetimeutc->format(self::DATE_FORMAT))
         ;
 
         return null === $qb->getQuery()->getOneOrNullResult();
@@ -116,7 +133,7 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
     #[\Override]
     public function findByAccountWithActionableAmount(
         Account $account,
-        string $sortOrder, // TODO: use enum
+        string $sortOrder,
         string $sortField = 'datetimeutc',
         int $limit = 1,
         int $offset = 0
@@ -125,7 +142,7 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
             ->select('t, s, e')
             ->innerJoin('t.stock', 's')
             ->innerJoin('s.exchange', 'e')
-            ->where('t.account = :account_id')
+            ->where(self::ACCOUNT_WHERE)
             ->andWhere('t.amountActionable.value > 0')
             ->setParameter('account_id', $account->getId(), 'uuid')
             ->orderBy('t.' . $this->sortFieldToString($sortField), $this->sortOrderToString($sortOrder))
@@ -145,7 +162,7 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
     public function portfolioSummary(Account $account, ?Stock $stock = null): SummaryVO
     {
         $and = [
-            't.account = :account_id',
+            self::ACCOUNT_WHERE,
             't.amountActionable.value > 0',
         ];
 
@@ -215,12 +232,12 @@ class AcquisitionRepository extends EntityRepository implements AcquisitionRepos
     {
         $qr = $this->createQueryBuilder('t')
                 ->select('COALESCE(SUM(t.amount.value), 0)')
-                ->where('t.account = :account_id')
-                ->andWhere('t.stock = :stock_code')
+                ->where(self::ACCOUNT_WHERE)
+                ->andWhere(self::STOCK_WHERE)
                 ->andWhere('t.datetimeutc <= :datetimeutc')
                 ->setParameter('account_id', $account->getId(), 'uuid')
                 ->setParameter('stock_code', $stock->getId())
-                ->setParameter('datetimeutc', $date->format('Y-m-d H:i:s'))
+                ->setParameter('datetimeutc', $date->format(self::DATE_FORMAT))
                 ->getQuery()
                 ->getSingleScalarResult();
         /** @var numeric-string */

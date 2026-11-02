@@ -25,6 +25,7 @@ use Xver\MiCartera\Domain\Stock\Application\Command\Transaction\LiquidationCreat
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
@@ -83,6 +84,7 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationR
 #[UsesClass(AcquisitionRepository::class)]
 #[UsesClass(LiquidationRepository::class)]
 #[UsesClass(MovementPriceVO::class)]
+#[UsesClass(MovementCollection::class)]
 class StockOperateCommandTest extends IntegrationTestCase
 {
     public function testPurchaseCommandSucceeds(): void

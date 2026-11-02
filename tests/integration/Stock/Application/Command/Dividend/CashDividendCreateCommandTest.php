@@ -36,6 +36,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendSynchronizer;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Criteria\FiFoCriteria;
@@ -101,6 +102,7 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(LiquidationPersistence::class)]
 #[UsesClass(LiquidationRepository::class)]
 #[UsesClass(LiquidationCreateCommand::class)]
+#[UsesClass(MovementCollection::class)]
 class CashDividendCreateCommandTest extends IntegrationTestCase
 {
     public function testCreatesCashDividendUsingHoldingAtOperationDateAndDefaultsExpensesToZero(): void

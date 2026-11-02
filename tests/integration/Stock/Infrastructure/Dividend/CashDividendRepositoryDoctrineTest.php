@@ -21,6 +21,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendAmountVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendMoneyVO;
 use Xver\MiCartera\Domain\Stock\Domain\Dividend\CashDividendPerShareVO;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\TransactionAmountVO;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendPersistence;
 use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Dividend\CashDividendRepository;
@@ -70,6 +71,7 @@ use Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\LiquidationR
 #[UsesClass(\Xver\MiCartera\Domain\Stock\Infrastructure\Doctrine\Transaction\Accounting\MovementPersistence::class)]
 #[UsesClass(AcquisitionPersistence::class)]
 #[UsesClass(LiquidationPersistence::class)]
+#[UsesClass(MovementCollection::class)]
 class CashDividendRepositoryDoctrineTest extends IntegrationTestCase
 {
     private CashDividendPersistence $cashDividentPersistence;

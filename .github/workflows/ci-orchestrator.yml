@@ -22,6 +22,7 @@ jobs:
   symfony-recipes:
     name: Symfony recipes check
     uses: ./.github/workflows/symfony-recipe-check.yml
+    secrets: inherit
 
   application-checks:
     name: Application Quality Assurance

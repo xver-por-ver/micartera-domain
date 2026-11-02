@@ -43,7 +43,7 @@
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "phpunit/phpunit": "^13.1",
         "symfony/finder": "^8.1",
-        "vimeo/psalm": "^6.10"
+        "vimeo/psalm": "^7.0"
     },
     "scripts": {
         "auto-scripts": {

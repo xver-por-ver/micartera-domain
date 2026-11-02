@@ -26,6 +26,7 @@ use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\StockProfitVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
@@ -85,6 +86,7 @@ use Xver\PhpAppCoreBundle\Exception\Domain\DomainViolationException;
 #[UsesClass(MovementPriceVO::class)]
 #[UsesClass(LiquidationCollection::class)]
 #[UsesClass(StockProfitVO::class)]
+#[UsesClass(MovementCollection::class)]
 class AcquisitionRepositoryDoctrineTest extends IntegrationTestCase
 {
     private AcquisitionPersistence $acquisitionPersistence;

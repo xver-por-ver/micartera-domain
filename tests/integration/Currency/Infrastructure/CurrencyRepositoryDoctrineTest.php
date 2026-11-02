@@ -23,6 +23,7 @@ use Xver\MiCartera\Domain\Number\Domain\NumberOperation;
 use Xver\MiCartera\Domain\Stock\Domain\Stock;
 use Xver\MiCartera\Domain\Stock\Domain\StockPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\Movement;
+use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementCollection;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Accounting\MovementPriceVO;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\Acquisition;
 use Xver\MiCartera\Domain\Stock\Domain\Transaction\AcquisitionCollection;
@@ -78,6 +79,7 @@ use Xver\PhpAppCoreBundle\Entity\Domain\EntityNotFoundException;
 #[UsesClass(AcquisitionRepository::class)]
 #[UsesClass(LiquidationRepository::class)]
 #[UsesClass(MovementRepository::class)]
+#[UsesClass(MovementCollection::class)]
 class CurrencyRepositoryDoctrineTest extends IntegrationTestCase
 {
     private CurrencyPersistence $currencyPersistence;

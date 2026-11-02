@@ -15,7 +15,7 @@ on:
       - 'translations/**'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
 

@@ -3,7 +3,7 @@
   "env": {
   },
   "packages": [
-    "php@8.5.11",
+    "php@8.5.12",
     "php85Extensions.xdebug@3.5.3"
   ],
   "shell": {

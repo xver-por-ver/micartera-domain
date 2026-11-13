@@ -4919,16 +4919,16 @@
         },
         {
             "name": "symfony/security-http",
-            "version": "v8.1.10",
+            "version": "v8.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-http.git",
-                "reference": "0076dbc980eeadd9faadb802e2c19afc134333ee"
+                "reference": "ad71cde1a58b7f4f8badbced425fb9c157761e33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-http/zipball/0076dbc980eeadd9faadb802e2c19afc134333ee",
-                "reference": "0076dbc980eeadd9faadb802e2c19afc134333ee",
+                "url": "https://api.github.com/repos/symfony/security-http/zipball/ad71cde1a58b7f4f8badbced425fb9c157761e33",
+                "reference": "ad71cde1a58b7f4f8badbced425fb9c157761e33",
                 "shasum": ""
             },
             "require": {
@@ -4984,7 +4984,7 @@
             "description": "Symfony Security Component - HTTP Integration",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-http/tree/v8.1.10"
+                "source": "https://github.com/symfony/security-http/tree/v8.1.11"
             },
             "funding": [
                 {
@@ -5004,8 +5004,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-28T10:55:21+00:00",
-            "published-time": "2026-10-28T18:24:52+00:00"
+            "time": "2026-11-04T08:39:20+00:00",
+            "published-time": "2026-11-04T11:31:07+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -5594,16 +5594,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v8.1.10",
+            "version": "v8.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "bf9171dc59f33fe84da8a5ca0e75f354194be325"
+                "reference": "9aa1e091b49b802e584cc4e583e7a8a182c04591"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/bf9171dc59f33fe84da8a5ca0e75f354194be325",
-                "reference": "bf9171dc59f33fe84da8a5ca0e75f354194be325",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/9aa1e091b49b802e584cc4e583e7a8a182c04591",
+                "reference": "9aa1e091b49b802e584cc4e583e7a8a182c04591",
                 "shasum": ""
             },
             "require": {
@@ -5667,7 +5667,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v8.1.10"
+                "source": "https://github.com/symfony/validator/tree/v8.1.11"
             },
             "funding": [
                 {
@@ -5687,8 +5687,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-27T13:53:09+00:00",
-            "published-time": "2026-10-28T18:23:42+00:00"
+            "time": "2026-11-04T08:39:20+00:00",
+            "published-time": "2026-11-04T11:31:06+00:00"
         },
         {
             "name": "symfony/var-dumper",
@@ -5986,16 +5986,16 @@
         },
         {
             "name": "xver/php-auth-core",
-            "version": "3.0.4",
+            "version": "3.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xver-por-ver/php-auth-core.git",
-                "reference": "a8ca7a64b0ed666569b9d86bfd617d260b01aa83"
+                "reference": "6b207315ae08bd9060adf1c5a61593eb0325bbb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xver-por-ver/php-auth-core/zipball/a8ca7a64b0ed666569b9d86bfd617d260b01aa83",
-                "reference": "a8ca7a64b0ed666569b9d86bfd617d260b01aa83",
+                "url": "https://api.github.com/repos/xver-por-ver/php-auth-core/zipball/6b207315ae08bd9060adf1c5a61593eb0325bbb4",
+                "reference": "6b207315ae08bd9060adf1c5a61593eb0325bbb4",
                 "shasum": ""
             },
             "require": {
@@ -6030,10 +6030,10 @@
             "description": "Provides Authentication",
             "support": {
                 "issues": "https://github.com/xver-por-ver/php-auth-core/issues",
-                "source": "https://github.com/xver-por-ver/php-auth-core/tree/3.0.4"
+                "source": "https://github.com/xver-por-ver/php-auth-core/tree/3.0.5"
             },
-            "time": "2026-11-02T16:28:59+00:00",
-            "published-time": "2026-11-02T16:30:39+00:00"
+            "time": "2026-11-13T19:51:55+00:00",
+            "published-time": "2026-11-13T19:53:06+00:00"
         }
     ],
     "packages-dev": [
